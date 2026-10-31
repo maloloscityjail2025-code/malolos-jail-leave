@@ -14,7 +14,8 @@ header { background: #172554; color: white; padding: 22px; display: flex; align-
 .logo-container { display: flex; align-items: center; gap: 10px; }
 .logo-container img, .logo-right img { height: 55px; width: 55px; object-fit: contain; background: white; border-radius: 50%; padding: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 header h1 { margin: 0 0 6px; font-size: 22px; }
-nav { background: #1e3a8a; padding: 12px 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+nav { background: #1e3a8a; padding: 12px 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.nav-links { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 nav a { color: white; text-decoration: none; margin-right: 15px; font-size: 14px; font-weight: bold; }
 nav a:hover { text-decoration: underline; }
 main { padding: 24px; max-width: 1400px; margin: auto; }
@@ -41,6 +42,7 @@ th { background: #eff6ff; color: #1e3a8a; }
 #leaveForm button { width: fit-content; grid-column: span 3; justify-self: start; }
 .qr-section { display: flex; align-items: center; gap: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 15px; flex-wrap: wrap; }
 #qrcode { background: white; padding: 10px; border-radius: 6px; display: inline-block; }
+.admin-badge { background: #15803d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
 footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 @media (max-width: 800px) {
     header { flex-direction: column; text-align: center; justify-content: center; }
@@ -76,11 +78,17 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 </header>
 
 <nav>
-    <a href="#dashboard">Dashboard</a>
-    <a href="#leaveFormSection">File Leave (Admin/HR)</a>
-    <a href="#qrSection">QR Code & Online Filing</a>
-    <a href="#requests">Leave Requests</a>
-    <a href="#summary">Leave Summary</a>
+    <div class="nav-links">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#leaveFormSection">File Leave</a>
+        <a href="#qrSection">QR Code & Online Filing</a>
+        <a href="#requests">Leave Requests</a>
+        <a href="#summary">Leave Summary</a>
+    </div>
+    <div>
+        <span id="adminStatusDisplay" style="color: #cbd5e1; font-size: 13px; margin-right: 10px;">Viewer Mode</span>
+        <button id="adminAuthBtn" onclick="toggleAdminModal()" style="background: #0284c7; padding: 6px 12px; font-size: 13px;">Admin Login</button>
+    </div>
 </nav>
 
 <main>
@@ -124,7 +132,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 </section>
 
 <section class="panel" id="leaveFormSection">
-    <h2>Add / File Leave Request</h2>
+    <h2>File Leave Request (Para sa Tauhan)</h2>
     <form id="leaveForm">
         <input id="employeeName" placeholder="Employee name" required>
         <input id="employeeId" placeholder="Employee ID (e.g., MLL-001)" required>
@@ -181,7 +189,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
                 <th>End Date</th>
                 <th>Days</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Actions <span id="actionHeaderBadge" style="font-size: 10px; color: #dc2626;">(Admin Only)</span></th>
             </tr>
         </thead>
         <tbody id="leaveTable"></tbody>
@@ -199,11 +207,73 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     Personnel Leave Management System | Malolos City Jail
 </footer>
 
+<!-- Admin Login Modal -->
+<div id="adminModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:30px; border-radius:10px; width:320px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <h3 style="margin-top:0; color:#1e3a8a;">Admin Login</h3>
+        <p style="font-size: 13px; color: #64748b;">Ilagay ang admin password para mag-approve o mag-delete ng leave requests.</p>
+        <input type="password" id="adminPasswordInput" placeholder="Enter password" style="width:100%; margin-bottom:12px;">
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" onclick="toggleAdminModal()" style="background:#64748b;">Cancel</button>
+            <button type="button" onclick="verifyAdmin()" style="background:#15803d;">Login</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB-d5AQghJ6cf6TIYoch4L5Tj2dWsmt4xBmV1mWiCC6aejs_L_VJB-gj-sN97glzZfaw/exec";
 // Google Sheet Web App URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzF2Kqqv5dKf6FFwvrotBAhgROESl-z7IBSAEoxvTtgzVTZzab97IGFUtjtPp88foQK2g/exec";
 
 let requests = [];
+let isAdmin = localStorage.getItem("malolos_admin") === "true";
+
+// Update UI state based on admin login
+function updateAdminUI() {
+    const statusDisplay = document.getElementById("adminStatusDisplay");
+    const authBtn = document.getElementById("adminAuthBtn");
+    const actionBadge = document.getElementById("actionHeaderBadge");
+
+    if (isAdmin) {
+        statusDisplay.innerHTML = '<span class="admin-badge">ADMIN MODE</span>';
+        authBtn.textContent = "Logout Admin";
+        authBtn.style.background = "#dc2626";
+        if(actionBadge) actionBadge.style.display = "none";
+    } else {
+        statusDisplay.textContent = "Viewer Mode";
+        authBtn.textContent = "Admin Login";
+        authBtn.style.background = "#0284c7";
+        if(actionBadge) actionBadge.style.display = "inline";
+    }
+    renderTable();
+}
+
+function toggleAdminModal() {
+    if (isAdmin) {
+        if (confirm("Gusto mo bang mag-logout bilang Admin?")) {
+            isAdmin = false;
+            localStorage.removeItem("malolos_admin");
+            updateAdminUI();
+        }
+    } else {
+        const modal = document.getElementById("adminModal");
+        modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+        document.getElementById("adminPasswordInput").value = "";
+    }
+}
+
+function verifyAdmin() {
+    const pass = document.getElementById("adminPasswordInput").value;
+    // Palitan ang password na ito ayon sa gusto mo (Default: "malolos2026")
+    if (pass === "malolos2026") {
+        isAdmin = true;
+        localStorage.setItem("malolos_admin", "true");
+        document.getElementById("adminModal").style.display = "none";
+        alert("Matagumpay kang naka-login bilang Admin!");
+        updateAdminUI();
+    } else {
+        alert("Maling password! Subukan muli.");
+    }
+}
 
 // Fetch data mula sa Google Sheet
 async function fetchDataFromSheet() {
@@ -218,7 +288,7 @@ async function fetchDataFromSheet() {
 }
 
 // Generate QR Code base sa kasalukuyang URL ng site
-const currentUrl = window.location.href;
+const currentUrl = window.location.href.split('#')[0];
 document.getElementById("shareableLink").value = currentUrl;
 
 try {
@@ -330,12 +400,14 @@ function renderTable() {
                 <td>${calculateDays(r.start, r.end)} day(s)</td>
                 <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
                 <td>
-                    ${r.status === "Pending" ? `
-                        <button class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
-                        <button class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
-                    ` : `
-                        <button class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
-                    `}
+                    ${isAdmin ? (
+                        r.status === "Pending" ? `
+                            <button class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
+                            <button class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
+                        ` : `
+                            <button class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
+                        `
+                    ) : '<span style="color:#94a3b8; font-size:12px; font-style:italic;">Restricted (Admin Only)</span>'}
                 </td>
             </tr>
         `).join("");
@@ -345,6 +417,10 @@ function renderTable() {
 }
 
 async function changeStatus(id, status) {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mag-approve/reject.");
+        return;
+    }
     const request = requests.find(r => r.id == id);
     if (!request) return;
     request.status = status;
@@ -361,6 +437,10 @@ async function changeStatus(id, status) {
 }
 
 async function deleteRequest(id) {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mag-delete.");
+        return;
+    }
     if (!confirm("Are you sure you want to delete this leave request?")) return;
     requests = requests.filter(r => r.id != id);
     renderTable();
@@ -425,8 +505,9 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
     }
 });
 
-// Load data sa unang bukas ng page
+// Initial setup
 fetchDataFromSheet();
+updateAdminUI();
 
 // Awtomatikong mag-update ng data mula sa Google Sheets tuwing 30 segundo
 setInterval(fetchDataFromSheet, 30000);
