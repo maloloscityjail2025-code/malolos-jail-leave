@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MALOLOS CITY JAIL Personnel Leave Dashboard</title>
+<!-- QR Code Library via CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Tahoma, sans-serif; background: #f1f5f9; color: #1e293b; }
+header { background: #172554; color: white; padding: 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.header-left { display: flex; align-items: center; gap: 15px; }
+.logo-container { display: flex; align-items: center; gap: 10px; }
+.logo-container img, .logo-right img { height: 120px; width: 120px; object-fit: contain; background: None; border-radius: 0%; padding: 0px; box-shadow: 0 0px 0px rgba(0,0,0,0.2); }
+header h1 { margin: 0 0 6px; font-size: 30px; }
+nav { background: #1e3a8a; padding: 12px 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+nav a { color: white; text-decoration: none; margin-right: 15px; font-size: 14px; font-weight: bold; }
+nav a:hover { text-decoration: underline; }
+main { padding: 24px; max-width: 1400px; margin: auto; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.card { background: white; padding: 22px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.card h3 { margin-top: 0; font-size: 13px; color: #64748b; letter-spacing: 0.5px; }
+.number { font-size: 32px; font-weight: bold; color: #2563eb; }
+.panel { background: white; padding: 20px; border-radius: 10px; margin-bottom: 24px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+button { border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; color: white; background: #2563eb; margin: 3px; font-weight: bold; }
+button:hover { opacity: 0.85; }
+.approve { background: #15803d; }
+.reject { background: #dc2626; }
+.delete { background: #64748b; }
+input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 5px 4px 5px 0; font-size: 14px; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 850px; }
+th, td { padding: 13px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
+th { background: #eff6ff; color: #1e3a8a; }
+.status { font-weight: bold; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+.Pending { color: #b45309; }
+.Approved { color: #15803d; }
+.Rejected { color: #dc2626; }
+#leaveForm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+#leaveForm input, #leaveForm select { width: 100%; margin: 0; }
+#leaveForm button { width: fit-content; grid-column: span 3; justify-self: start; }
+.qr-section { display: flex; align-items: center; gap: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 15px; flex-wrap: wrap; }
+#qrcode { background: white; padding: 10px; border-radius: 6px; display: inline-block; }
+footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
+@media (max-width: 800px) {
+    header { flex-direction: column; text-align: center; justify-content: center; }
+    .header-left { flex-direction: column; text-align: center; }
+    .logo-container { justify-content: center; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    #leaveForm { grid-template-columns: 1fr; }
+    #leaveForm button { grid-column: span 1; width: 100%; }
+    main { padding: 12px; }
+    nav a { display: inline-block; margin: 5px; }
+}
+@media (max-width: 420px) {
+    .cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="logo-container">
+            <img src="logo12.png" alt="Logo 1">
+            <img src="logo2.png" alt="Logo 2">
+        </div>
+        <div>
+            <h1>MALOLOS CITY JAIL - Personnel Leave Dashboard</h1>
+            <div>Human Resources and Personnel Management System</div>
+        </div>
+    </div>
+    <div class="logo-right">
+        <img src="logo3.png" alt="Logo 3">
+    </div>
+</header>
+
+<nav>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#leaveFormSection">File Leave (Admin/HR)</a>
+    <a href="#qrSection">QR Code & Online Filing</a>
+    <a href="#requests">Leave Requests</a>
+    <a href="#summary">Leave Summary</a>
+</nav>
+
+<main>
+
+<section id="dashboard">
+    <h2>Dashboard Overview</h2>
+    <div class="cards">
+        <div class="card">
+            <h3>TOTAL PERSONNEL</h3>
+            <div class="number" id="totalPersonnel">38</div>
+        </div>
+        <div class="card">
+            <h3>PENDING REQUESTS</h3>
+            <div class="number" id="pendingCount">0</div>
+        </div>
+        <div class="card">
+            <h3>APPROVED REQUESTS</h3>
+            <div class="number" id="approvedCount">0</div>
+        </div>
+        <div class="card">
+            <h3>PERSONNEL ON LEAVE TODAY</h3>
+            <div class="number" id="onLeaveCount">0</div>
+        </div>
+    </div>
+</section>
+
+<!-- QR Code & Online Link Section -->
+<section class="panel" id="qrSection">
+    <h2>Online & QR Code Leave Filing</h2>
+    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form, o kopyahin ang link sa ibaba.</p>
+    
+    <div class="qr-section">
+        <div id="qrcode"></div>
+        <div>
+            <p><strong>Direct Online Filing Link:</strong></p>
+            <input type="text" id="shareableLink" readonly style="width: 300px; background: #e2e8f0;" value="">
+            <br>
+            <button type="button" onclick="copyLink()" style="margin-top: 8px; background: #0284c7;">Kopyahin ang Link</button>
+        </div>
+    </div>
+</section>
+
+<section class="panel" id="leaveFormSection">
+    <h2>Add / File Leave Request</h2>
+    <form id="leaveForm">
+        <input id="employeeName" placeholder="Employee name" required>
+        <input id="employeeId" placeholder="Employee ID (e.g., MLL-001)" required>
+        <select id="department" required>
+            <option value="">Select department</option>
+            <option>Security and Control</option>
+            <option>Administration</option>
+            <option>Deputy</option>
+            <option>Warden Office</option>
+            <option>IT Unit</option>
+        </select>
+        <select id="leaveType" required>
+            <option value="">Select leave type</option>
+            <option>Vacation</option>
+            <option>Sick</option>
+            <option>Emergency</option>
+            <option>Personal</option>
+            <option>Other</option>
+        </select>
+        <input type="date" id="startDate" aria-label="Leave start date" required>
+        <input type="date" id="endDate" aria-label="Leave end date" required>
+        <button type="submit">Submit Leave Request</button>
+    </form>
+</section>
+
+<section class="panel" id="requests">
+    <h2>Leave Requests</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <input id="search" placeholder="Search employee or ID..." oninput="renderTable()">
+        <select id="filterStatus" onchange="renderTable()">
+            <option value="">All statuses</option>
+            <option>Pending</option>
+            <option>Approved</option>
+            <option>Rejected</option>
+        </select>
+        <select id="filterType" onchange="renderTable()">
+            <option value="">All leave types</option>
+            <option>Vacation</option>
+            <option>Sick</option>
+            <option>Emergency</option>
+            <option>Personal</option>
+            <option>Other</option>
+        </select>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Leave Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="leaveTable"></tbody>
+    </table>
+</section>
+
+<section class="panel" id="summary">
+    <h2>Leave Type Summary</h2>
+    <div id="leaveSummary"></div>
+</section>
+
+</main>
+
+<footer>
+    Personnel Leave Management System | Malolos City Jail
+</footer>
+
+<script>
+const STORAGE_KEY = "personnelLeaveRequestsDemo";
+
+const initialRequests = [
+    { id: 1, name: "E-jay Fabros", employeeId: "MLL-001", department: "Administration", type: "Vacation", start: "2026-10-28", end: "2026-10-30", status: "Pending" },
+    { id: 2, name: "Jose Reyes", employeeId: "EMP-002", department: "Finance", type: "Sick", start: "2026-10-26", end: "2026-10-27", status: "Pending" },
+    { id: 3, name: "Ana Garcia", employeeId: "EMP-003", department: "Human Resources", type: "Emergency", start: "2026-10-21", end: "2026-10-21", status: "Approved" }
+];
+
+let requests;
+
+try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    requests = saved ? JSON.parse(saved) : initialRequests.map(r => ({...r}));
+    if (!Array.isArray(requests)) {
+        requests = initialRequests.map(r => ({...r}));
+    }
+} catch (error) {
+    requests = initialRequests.map(r => ({...r}));
+}
+
+// Generate QR Code based on current page URL or deployment link
+const currentUrl = window.location.href;
+document.getElementById("shareableLink").value = currentUrl;
+
+try {
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+        text: currentUrl,
+        width: 120,
+        height: 120
+    });
+} catch(e) {
+    console.log("QR Code generation error:", e);
+}
+
+function copyLink() {
+    const linkInput = document.getElementById("shareableLink");
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(linkInput.value);
+    alert("Na-copy na ang link! Maaari mo itong i-send sa mga tauhan.");
+}
+
+function saveData() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+    } catch (error) {
+        alert("Browser storage is unavailable. Changes may not persist.");
+    }
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+function formatDate(value) {
+    if (!value) return "";
+    return new Date(value + "T00:00:00").toLocaleDateString(
+        "en-PH",
+        {year: "numeric", month: "short", day: "numeric"}
+    );
+}
+
+function calculateDays(start, end) {
+    const a = new Date(start + "T00:00:00");
+    const b = new Date(end + "T00:00:00");
+    return Math.max(1, Math.round((b - a) / 86400000) + 1);
+}
+
+function todayString() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function updateDashboard() {
+    const today = todayString();
+
+    document.getElementById("pendingCount").textContent =
+        requests.filter(r => r.status === "Pending").length;
+
+    document.getElementById("approvedCount").textContent =
+        requests.filter(r => r.status === "Approved").length;
+
+    document.getElementById("onLeaveCount").textContent =
+        requests.filter(r =>
+            r.status === "Approved" &&
+            r.start <= today &&
+            r.end >= today
+        ).length;
+
+    const types = ["Vacation", "Sick", "Emergency", "Personal", "Other"];
+
+    document.getElementById("leaveSummary").innerHTML =
+        types.map(type => {
+            const count = requests.filter(r => r.type === type).length;
+            return `<p><strong>${escapeHTML(type)} Leave:</strong> ${count} request(s)</p>`;
+        }).join("");
+}
+
+function renderTable() {
+    const search = document.getElementById("search").value.toLowerCase().trim();
+    const status = document.getElementById("filterStatus").value;
+    const type = document.getElementById("filterType").value;
+
+    const filtered = requests.filter(r => {
+        const matchesSearch =
+            r.name.toLowerCase().includes(search) ||
+            r.employeeId.toLowerCase().includes(search);
+
+        return matchesSearch &&
+            (!status || r.status === status) &&
+            (!type || r.type === type);
+    });
+
+    const table = document.getElementById("leaveTable");
+
+    if (filtered.length === 0) {
+        table.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #64748b; padding: 20px;">No leave requests found.</td></tr>';
+    } else {
+        table.innerHTML = filtered.map(r => `
+            <tr>
+                <td>
+                    <strong>${escapeHTML(r.name)}</strong><br>
+                    <span style="color: #64748b; font-size: 11px;">${escapeHTML(r.employeeId)}</span>
+                </td>
+                <td>${escapeHTML(r.department)}</td>
+                <td>${escapeHTML(r.type)}</td>
+                <td>${formatDate(r.start)}</td>
+                <td>${formatDate(r.end)}</td>
+                <td>${calculateDays(r.start, r.end)} day(s)</td>
+                <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
+                <td>
+                    ${r.status === "Pending" ? `
+                        <button class="approve" onclick="changeStatus(${r.id}, 'Approved')">Approve</button>
+                        <button class="reject" onclick="changeStatus(${r.id}, 'Rejected')">Reject</button>
+                    ` : `
+                        <button class="delete" onclick="deleteRequest(${r.id})">Delete</button>
+                    `}
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    updateDashboard();
+}
+
+function changeStatus(id, status) {
+    const request = requests.find(r => r.id === id);
+    if (!request) return;
+    request.status = status;
+    saveData();
+    renderTable();
+}
+
+function deleteRequest(id) {
+    if (!confirm("Are you sure you want to delete this leave request?")) return;
+    requests = requests.filter(r => r.id !== id);
+    saveData();
+    renderTable();
+}
+
+document.getElementById("leaveForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("employeeName").value.trim();
+    const employeeId = document.getElementById("employeeId").value.trim();
+    const department = document.getElementById("department", true).value;
+    const type = document.getElementById("leaveType").value;
+    const start = document.getElementById("startDate").value;
+    const end = document.getElementById("endDate").value;
+
+    if (end < start) {
+        alert("End date must be on or after the start date.");
+        return;
+    }
+
+    const duplicate = requests.some(r =>
+        r.employeeId.toLowerCase() === employeeId.toLowerCase() &&
+        r.start === start &&
+        r.end === end &&
+        r.status !== "Rejected"
+    );
+
+    if (duplicate) {
+        alert("A similar leave request already exists for this employee.");
+        return;
+    }
+
+    const newRequest = {
+        id: requests.length > 0 ? Math.max(...requests.map(r => r.id)) + 1 : 1,
+        name,
+        employeeId,
+        department,
+        type,
+        start,
+        end,
+        status: "Pending"
+    };
+
+    requests.unshift(newRequest);
+    saveData();
+    renderTable();
+    this.reset();
+    alert("Leave request submitted successfully via Online Portal!");
+});
+
+renderTable();
+</script>
+
+</body>
+</html>
