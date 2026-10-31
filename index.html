@@ -222,7 +222,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 
 <script>
 // Google Sheet Web App URL
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwKcRN0mPa-mffYr_59KCxV6f_HVVgZJngLl8qz8zzlORwzPGezASnkFDGigClX2-TpbA/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3qNLH4KncALbDhaSjrwroQRi6U9feC0DNdfBs3njCONiaYY6qbBwQvdC01plpRNBi_A/exec";
 
 let requests = [];
 let isAdmin = localStorage.getItem("malolos_admin") === "true";
@@ -263,7 +263,6 @@ function toggleAdminModal() {
 
 function verifyAdmin() {
     const pass = document.getElementById("adminPasswordInput").value;
-    // Palitan ang password na ito ayon sa gusto mo (Default: "malolos2026")
     if (pass === "malolos2026") {
         isAdmin = true;
         localStorage.setItem("malolos_admin", "true");
@@ -276,12 +275,152 @@ function verifyAdmin() {
 }
 
 // Fetch data mula sa Google Sheet
-// Function para sa pagpapadala ng request sa Google Apps Script nang walang CORS error
+async function fetchDataFromSheet() {
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        const data = await response.json();
+        requests = data;
+        renderTable();
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
+
+// Generate QR Code base sa kasalukuyang URL ng site
+const currentUrl = window.location.href.split('#')[0];
+document.getElementById("shareableLink").value = currentUrl;
+
+try {
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+        text: currentUrl,
+        width: 120,
+        height: 120
+    });
+} catch(e) {
+    console.log("QR Code error:", e);
+}
+
+function copyLink() {
+    const linkInput = document.getElementById("shareableLink");
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(linkInput.value);
+    alert("Na-copy na ang link! Maaari mo itong i-send sa mga tauhan.");
+}
+
+function escapeHTML(value) {
+    return String(value || "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+function formatDate(value) {
+    if (!value) return "";
+    return new Date(value).toLocaleDateString(
+        "en-PH",
+        {year: "numeric", month: "short", day: "numeric"}
+    );
+}
+
+function calculateDays(start, end) {
+    const a = new Date(start);
+    const b = new Date(end);
+    return Math.max(1, Math.round((b - a) / 86400000) + 1);
+}
+
+function todayString() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function updateDashboard() {
+    const today = todayString();
+
+    document.getElementById("pendingCount").textContent =
+        requests.filter(r => r.status === "Pending").length;
+
+    document.getElementById("approvedCount").textContent =
+        requests.filter(r => r.status === "Approved").length;
+
+    document.getElementById("onLeaveCount").textContent =
+        requests.filter(r =>
+            r.status === "Approved" &&
+            r.start <= today &&
+            r.end >= today
+        ).length;
+
+    const types = ["Vacation", "Sick", "Emergency", "Personal", "Other"];
+
+    document.getElementById("leaveSummary").innerHTML =
+        types.map(type => {
+            const count = requests.filter(r => r.type === type).length;
+            return `<p><strong>${escapeHTML(type)} Leave:</strong> ${count} request(s)</p>`;
+        }).join("");
+}
+
+function renderTable() {
+    const search = document.getElementById("search").value.toLowerCase().trim();
+    const status = document.getElementById("filterStatus").value;
+    const type = document.getElementById("filterType").value;
+
+    const filtered = requests.filter(r => {
+        const matchesSearch =
+            (r.name && r.name.toLowerCase().includes(search)) ||
+            (r.employeeId && r.employeeId.toLowerCase().includes(search));
+
+        return matchesSearch &&
+            (!status || r.status === status) &&
+            (!type || r.type === type);
+    });
+
+    const table = document.getElementById("leaveTable");
+
+    if (filtered.length === 0) {
+        table.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #64748b; padding: 20px;">No leave requests found.</td></tr>';
+    } else {
+        table.innerHTML = filtered.map(r => `
+            <tr>
+                <td>
+                    <strong>${escapeHTML(r.name)}</strong><br>
+                    <span style="color: #64748b; font-size: 11px;">${escapeHTML(r.employeeId)}</span>
+                </td>
+                <td>${escapeHTML(r.department)}</td>
+                <td>${escapeHTML(r.type)}</td>
+                <td>${formatDate(r.start)}</td>
+                <td>${formatDate(r.end)}</td>
+                <td>${calculateDays(r.start, r.end)} day(s)</td>
+                <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
+                <td>
+                    ${isAdmin ? (
+                        r.status === "Pending" ? `
+                            <button class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
+                            <button class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
+                        ` : `
+                            <button class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
+                        `
+                    ) : '<span style="color:#94a3b8; font-size:12px; font-style:italic;">Restricted (Admin Only)</span>'}
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    updateDashboard();
+}
+
+// Function para sa pagpapadala sa Google Script gamit ang no-cors para iwas error sa save
 async function sendToGoogleScript(payload) {
     try {
         await fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
-            mode: "no-cors", // Sumasagot sa CORS restriction ng Google Web Apps
+            mode: "no-cors",
             headers: {
                 "Content-Type": "text/plain"
             },
@@ -294,7 +433,33 @@ async function sendToGoogleScript(payload) {
     }
 }
 
-// 1. Submit Form Update
+async function changeStatus(id, status) {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mag-approve/reject.");
+        return;
+    }
+    const request = requests.find(r => r.id == id);
+    if (!request) return;
+    request.status = status;
+    renderTable();
+
+    await sendToGoogleScript({ action: "updateStatus", id: id, status: status });
+    setTimeout(fetchDataFromSheet, 1500);
+}
+
+async function deleteRequest(id) {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mag-delete.");
+        return;
+    }
+    if (!confirm("Are you sure you want to delete this leave request?")) return;
+    requests = requests.filter(r => r.id != id);
+    renderTable();
+
+    await sendToGoogleScript({ action: "delete", id: id });
+    setTimeout(fetchDataFromSheet, 1500);
+}
+
 document.getElementById("leaveForm").addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -333,7 +498,7 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
     if (success) {
         alert("Leave request submitted successfully to Google Sheets!");
         this.reset();
-        setTimeout(fetchDataFromSheet, 1500); // Maghintay ng konti bago i-fetch ulit
+        setTimeout(fetchDataFromSheet, 1500);
     } else {
         alert("May naganap na error sa pag-save. Pakisubukan muli.");
     }
@@ -341,35 +506,6 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit Leave Request";
 });
-
-// 2. Change Status Update
-async function changeStatus(id, status) {
-    if (!isAdmin) {
-        alert("Kailangan mong mag-admin login para mag-approve/reject.");
-        return;
-    }
-    const request = requests.find(r => r.id == id);
-    if (!request) return;
-    request.status = status;
-    renderTable();
-
-    await sendToGoogleScript({ action: "updateStatus", id: id, status: status });
-    setTimeout(fetchDataFromSheet, 1500);
-}
-
-// 3. Delete Request Update
-async function deleteRequest(id) {
-    if (!isAdmin) {
-        alert("Kailangan mong mag-admin login para mag-delete.");
-        return;
-    }
-    if (!confirm("Are you sure you want to delete this leave request?")) return;
-    requests = requests.filter(r => r.id != id);
-    renderTable();
-
-    await sendToGoogleScript({ action: "delete", id: id });
-    setTimeout(fetchDataFromSheet, 1500);
-}
 
 // Initial setup
 fetchDataFromSheet();
