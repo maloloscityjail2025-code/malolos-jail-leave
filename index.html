@@ -122,7 +122,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 <!-- QR Code Section -->
 <section class="panel" id="qrSection">
     <h2>Online & QR Code Leave Filing</h2>
-    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form.</p>
+    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form[cite: 3].</p>
     
     <div class="qr-section">
         <div id="qrcode"></div>
@@ -136,7 +136,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 </section>
 
 <section class="panel" id="leaveFormSection">
-    <h2>File Leave Request (Para sa Tauhan)</h2>
+    <h2 id="formTitleHeader">File Leave Request (Para sa Tauhan)</h2>
     <form id="leaveForm">
         <div>
             <label style="font-size: 12px; font-weight: bold; color: #64748b;">Employee Name</label>
@@ -147,7 +147,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
             <input id="employeeId" placeholder="e.g., MLL-001" required>
         </div>
         <div>
-            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Department</label>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Select Department</label>
             <select id="department" required>
                 <option value="">Select department</option>
                 <option>Security and Control</option>
@@ -159,7 +159,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
             </select>
         </div>
         <div>
-            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Leave Type</label>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Select Leave Type</label>
             <select id="leaveType" required>
                 <option value="">Select leave type</option>
                 <option>Vacation</option>
@@ -170,11 +170,11 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
             </select>
         </div>
         <div>
-            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date From (Start Date)</label>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date From</label>
             <input type="date" id="startDate" required>
         </div>
         <div>
-            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date To (End Date)</label>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date To</label>
             <input type="date" id="endDate" required>
         </div>
         <textarea id="reason" rows="3" placeholder="Ilagay ang dahilan o reason ng pag-leave..." required style="grid-column: span 2;"></textarea>
@@ -227,7 +227,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 
 </main>
 
-<footer>
+<footer id="mainFooter">
     Personnel Leave Management System | Malolos City Jail
 </footer>
 
@@ -281,13 +281,17 @@ const urlParams = new URLSearchParams(window.location.search);
 const isFormMode = urlParams.get('mode') === 'form';
 
 if (isFormMode) {
-    // Itago ang buong dashboard, nav, header, at iba pang sections kung QR code ang ginamit pumasok
+    // Itago ang buong dashboard, nav, header, at iba pang sections
     document.getElementById("mainHeader").style.display = "none";
     document.getElementById("mainNav").style.display = "none";
     document.getElementById("dashboard").style.display = "none";
     document.getElementById("qrSection").style.display = "none";
     document.getElementById("requests").style.display = "none";
     document.getElementById("summary").style.display = "none";
+    document.getElementById("mainFooter").style.display = "none";
+    
+    // Baguhin ang pamagat ng form para maging angkop sa mobile view ng mga tauhan
+    document.getElementById("formTitleHeader").textContent = "Malolos City Jail - Online Leave Filing Form";
 }
 
 // Update UI state based on admin login
@@ -312,7 +316,9 @@ function updateAdminUI() {
             if(editPersonnelBtn) editPersonnelBtn.style.display = "none";
         }
     }
-    renderTable();
+    if (!isFormMode) {
+        renderTable();
+    }
 }
 
 function toggleAdminModal() {
@@ -344,7 +350,7 @@ function verifyAdmin() {
 
 // Fetch data mula sa Google Sheet
 async function fetchDataFromSheet() {
-    if (isFormMode) return; // Huwag nang mag-fetch kung form mode lang para sa QR scan
+    if (isFormMode) return; 
     try {
         const response = await fetch(GOOGLE_SCRIPT_URL);
         const data = await response.json();
@@ -563,7 +569,7 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
     const newRequest = {
         action: "add",
         id: Date.now(),
-        name,
+    	name,
         employeeId,
         department,
         type,
@@ -578,9 +584,6 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
     if (success) {
         alert("Leave request submitted successfully!");
         this.reset();
-        if(!isFormMode) {
-            setTimeout(fetchDataFromSheet, 1500);
-        }
     } else {
         alert("May naganap na error sa pag-save. Pakisubukan muli.");
     }
@@ -595,7 +598,6 @@ if (!isFormMode) {
     updateAdminUI();
     setInterval(fetchDataFromSheet, 30000);
 } else {
-    // Kung form mode, i-hide ang admin status display sa taas kung meron man
     updateAdminUI();
 }
 </script>
