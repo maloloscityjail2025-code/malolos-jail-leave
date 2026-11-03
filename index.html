@@ -29,7 +29,7 @@ button:hover { opacity: 0.85; }
 .approve { background: #15803d; }
 .reject { background: #dc2626; }
 .delete { background: #64748b; }
-input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 5px 4px 5px 0; font-size: 14px; }
+input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 5px 4px 5px 0; font-size: 14px; width: 100%; }
 table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 850px; }
 th, td { padding: 13px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
 th { background: #eff6ff; color: #1e3a8a; }
@@ -37,9 +37,9 @@ th { background: #eff6ff; color: #1e3a8a; }
 .Pending { color: #b45309; }
 .Approved { color: #15803d; }
 .Rejected { color: #dc2626; }
-#leaveForm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-#leaveForm input, #leaveForm select { width: 100%; margin: 0; }
-#leaveForm button { width: fit-content; grid-column: span 3; justify-self: start; }
+#leaveForm { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+#leaveForm textarea { grid-column: span 2; }
+#leaveForm button { width: fit-content; grid-column: span 2; justify-self: start; }
 .qr-section { display: flex; align-items: center; gap: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 15px; flex-wrap: wrap; }
 #qrcode { background: white; padding: 10px; border-radius: 6px; display: inline-block; }
 .admin-badge { background: #15803d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
@@ -50,6 +50,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     .logo-container { justify-content: center; }
     .cards { grid-template-columns: repeat(2, 1fr); }
     #leaveForm { grid-template-columns: 1fr; }
+    #leaveForm textarea { grid-column: span 1; }
     #leaveForm button { grid-column: span 1; width: 100%; }
     main { padding: 12px; }
     nav a { display: inline-block; margin: 5px; }
@@ -61,7 +62,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 </head>
 <body>
 
-<header>
+<header id="mainHeader">
     <div class="header-left">
         <div class="logo-container">
             <img src="logo12.png" alt="Logo 1">
@@ -77,7 +78,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     </div>
 </header>
 
-<nav>
+<nav id="mainNav">
     <div class="nav-links">
         <a href="#dashboard">Dashboard</a>
         <a href="#leaveFormSection">File Leave</a>
@@ -91,7 +92,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     </div>
 </nav>
 
-<main>
+<main id="mainContainer">
 
 <section id="dashboard">
     <h2>Dashboard Overview</h2>
@@ -137,27 +138,46 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 <section class="panel" id="leaveFormSection">
     <h2>File Leave Request (Para sa Tauhan)</h2>
     <form id="leaveForm">
-        <input id="employeeName" placeholder="Employee name" required>
-        <input id="employeeId" placeholder="Employee ID (e.g., MLL-001)" required>
-        <select id="department" required>
-            <option value="">Select department</option>
-            <option>Security and Control</option>
-            <option>Administration</option>
-            <option>Finance</option>
-            <option>Human Resources</option>
-            <option>Warden Office</option>
-            <option>IT Unit</option>
-        </select>
-        <select id="leaveType" required>
-            <option value="">Select leave type</option>
-            <option>Vacation</option>
-            <option>Sick</option>
-            <option>Emergency</option>
-            <option>Personal</option>
-            <option>Other</option>
-        </select>
-        <input type="date" id="startDate" aria-label="Leave start date" required>
-        <input type="date" id="endDate" aria-label="Leave end date" required>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Employee Name</label>
+            <input id="employeeName" placeholder="Ilagay ang pangalan" required>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Employee ID</label>
+            <input id="employeeId" placeholder="e.g., MLL-001" required>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Department</label>
+            <select id="department" required>
+                <option value="">Select department</option>
+                <option>Security and Control</option>
+                <option>Administration</option>
+                <option>Finance</option>
+                <option>Human Resources</option>
+                <option>Warden Office</option>
+                <option>IT Unit</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Leave Type</label>
+            <select id="leaveType" required>
+                <option value="">Select leave type</option>
+                <option>Vacation</option>
+                <option>Sick</option>
+                <option>Emergency</option>
+                <option>Personal</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date From (Start Date)</label>
+            <input type="date" id="startDate" required>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date To (End Date)</label>
+            <input type="date" id="endDate" required>
+        </div>
+        <textarea id="reason" rows="3" placeholder="Ilagay ang dahilan o reason ng pag-leave..." required style="grid-column: span 2;"></textarea>
         <button type="submit" id="submitBtn">Submit Leave Request</button>
     </form>
 </section>
@@ -190,6 +210,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
                 <th>Leave Type</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Reason</th>
                 <th>Days</th>
                 <th>Status</th>
                 <th>Actions <span id="actionHeaderBadge" style="font-size: 10px; color: #dc2626;">(Admin Only)</span></th>
@@ -232,7 +253,8 @@ let isAdmin = localStorage.getItem("malolos_admin") === "true";
 
 // Total Personnel Count Setup
 let totalPersonnelCount = localStorage.getItem("malolos_total_personnel") || 38;
-document.getElementById("totalPersonnel").textContent = totalPersonnelCount;
+const totalPersonnelEl = document.getElementById("totalPersonnel");
+if(totalPersonnelEl) totalPersonnelEl.textContent = totalPersonnelCount;
 
 function editTotalPersonnel() {
     if (!isAdmin) {
@@ -254,6 +276,20 @@ function editTotalPersonnel() {
     }
 }
 
+// Suriin kung naka-form mode (kapag na-scan ang QR code)
+const urlParams = new URLSearchParams(window.location.search);
+const isFormMode = urlParams.get('mode') === 'form';
+
+if (isFormMode) {
+    // Itago ang buong dashboard, nav, header, at iba pang sections kung QR code ang ginamit pumasok
+    document.getElementById("mainHeader").style.display = "none";
+    document.getElementById("mainNav").style.display = "none";
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("qrSection").style.display = "none";
+    document.getElementById("requests").style.display = "none";
+    document.getElementById("summary").style.display = "none";
+}
+
 // Update UI state based on admin login
 function updateAdminUI() {
     const statusDisplay = document.getElementById("adminStatusDisplay");
@@ -261,18 +297,20 @@ function updateAdminUI() {
     const actionBadge = document.getElementById("actionHeaderBadge");
     const editPersonnelBtn = document.getElementById("editPersonnelBtn");
 
-    if (isAdmin) {
-        statusDisplay.innerHTML = '<span class="admin-badge">ADMIN MODE</span>';
-        authBtn.textContent = "Logout Admin";
-        authBtn.style.background = "#dc2626";
-        if(actionBadge) actionBadge.style.display = "none";
-        if(editPersonnelBtn) editPersonnelBtn.style.display = "inline-block";
-    } else {
-        statusDisplay.textContent = "Viewer Mode";
-        authBtn.textContent = "Admin Login";
-        authBtn.style.background = "#0284c7";
-        if(actionBadge) actionBadge.style.display = "inline";
-        if(editPersonnelBtn) editPersonnelBtn.style.display = "none";
+    if (statusDisplay && authBtn) {
+        if (isAdmin) {
+            statusDisplay.innerHTML = '<span class="admin-badge">ADMIN MODE</span>';
+            authBtn.textContent = "Logout Admin";
+            authBtn.style.background = "#dc2626";
+            if(actionBadge) actionBadge.style.display = "none";
+            if(editPersonnelBtn) editPersonnelBtn.style.display = "inline-block";
+        } else {
+            statusDisplay.textContent = "Viewer Mode";
+            authBtn.textContent = "Admin Login";
+            authBtn.style.background = "#0284c7";
+            if(actionBadge) actionBadge.style.display = "inline";
+            if(editPersonnelBtn) editPersonnelBtn.style.display = "none";
+        }
     }
     renderTable();
 }
@@ -306,6 +344,7 @@ function verifyAdmin() {
 
 // Fetch data mula sa Google Sheet
 async function fetchDataFromSheet() {
+    if (isFormMode) return; // Huwag nang mag-fetch kung form mode lang para sa QR scan
     try {
         const response = await fetch(GOOGLE_SCRIPT_URL);
         const data = await response.json();
@@ -316,17 +355,22 @@ async function fetchDataFromSheet() {
     }
 }
 
-// Generate QR Code base sa kasalukuyang URL ng site
-const currentUrl = window.location.href.split('#')[0];
-document.getElementById("shareableLink").value = currentUrl;
+// Generate QR Code base sa link na may kasamang ?mode=form
+const baseSiteUrl = window.location.href.split('?')[0].split('#')[0];
+const qrTargetUrl = baseSiteUrl + "?mode=form";
+const shareableLinkInput = document.getElementById("shareableLink");
+if(shareableLinkInput) shareableLinkInput.value = qrTargetUrl;
 
 try {
-    document.getElementById("qrcode").innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), {
-        text: currentUrl,
-        width: 120,
-        height: 120
-    });
+    const qrcodeContainer = document.getElementById("qrcode");
+    if(qrcodeContainer) {
+        qrcodeContainer.innerHTML = "";
+        new QRCode(qrcodeContainer, {
+            text: qrTargetUrl,
+            width: 120,
+            height: 120
+        });
+    }
 } catch(e) {
     console.log("QR Code error:", e);
 }
@@ -336,7 +380,7 @@ function copyLink() {
     linkInput.select();
     linkInput.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(linkInput.value);
-    alert("Na-copy na ang link! Maaari mo itong i-send sa mga tauhan.");
+    alert("Na-copy na ang link para sa QR Code! Maaari mo itong i-send sa mga tauhan.");
 }
 
 function escapeHTML(value) {
@@ -372,34 +416,36 @@ function todayString() {
 }
 
 function updateDashboard() {
+    if (isFormMode) return;
     const today = todayString();
 
-    document.getElementById("pendingCount").textContent =
-        requests.filter(r => r.status === "Pending").length;
+    const pendingEl = document.getElementById("pendingCount");
+    const approvedEl = document.getElementById("approvedCount");
+    const onLeaveEl = document.getElementById("onLeaveCount");
+    const leaveSummaryEl = document.getElementById("leaveSummary");
 
-    document.getElementById("approvedCount").textContent =
-        requests.filter(r => r.status === "Approved").length;
-
-    document.getElementById("onLeaveCount").textContent =
-        requests.filter(r =>
-            r.status === "Approved" &&
-            r.start <= today &&
-            r.end >= today
-        ).length;
+    if(pendingEl) pendingEl.textContent = requests.filter(r => r.status === "Pending").length;
+    if(approvedEl) approvedEl.textContent = requests.filter(r => r.status === "Approved").length;
+    if(onLeaveEl) onLeaveEl.textContent = requests.filter(r => r.status === "Approved" && r.start <= today && r.end >= today).length;
 
     const types = ["Vacation", "Sick", "Emergency", "Personal", "Other"];
-
-    document.getElementById("leaveSummary").innerHTML =
-        types.map(type => {
+    if(leaveSummaryEl) {
+        leaveSummaryEl.innerHTML = types.map(type => {
             const count = requests.filter(r => r.type === type).length;
             return `<p><strong>${escapeHTML(type)} Leave:</strong> ${count} request(s)</p>`;
         }).join("");
+    }
 }
 
 function renderTable() {
-    const search = document.getElementById("search").value.toLowerCase().trim();
-    const status = document.getElementById("filterStatus").value;
-    const type = document.getElementById("filterType").value;
+    if (isFormMode) return;
+    const searchInput = document.getElementById("search");
+    const filterStatusInput = document.getElementById("filterStatus");
+    const filterTypeInput = document.getElementById("filterType");
+
+    const search = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const status = filterStatusInput ? filterStatusInput.value : "";
+    const type = filterTypeInput ? filterTypeInput.value : "";
 
     const filtered = requests.filter(r => {
         const matchesSearch =
@@ -412,9 +458,10 @@ function renderTable() {
     });
 
     const table = document.getElementById("leaveTable");
+    if (!table) return;
 
     if (filtered.length === 0) {
-        table.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #64748b; padding: 20px;">No leave requests found.</td></tr>';
+        table.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #64748b; padding: 20px;">No leave requests found.</td></tr>';
     } else {
         table.innerHTML = filtered.map(r => `
             <tr>
@@ -426,6 +473,7 @@ function renderTable() {
                 <td>${escapeHTML(r.type)}</td>
                 <td>${formatDate(r.start)}</td>
                 <td>${formatDate(r.end)}</td>
+                <td>${escapeHTML(r.reason || '-')}</td>
                 <td>${calculateDays(r.start, r.end)} day(s)</td>
                 <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
                 <td>
@@ -445,7 +493,7 @@ function renderTable() {
     updateDashboard();
 }
 
-// Function para sa pagpapadala sa Google Script gamit ang no-cors para iwas error sa save
+// Function para sa pagpapadala sa Google Script
 async function sendToGoogleScript(payload) {
     try {
         await fetch(GOOGLE_SCRIPT_URL, {
@@ -503,6 +551,7 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
     const type = document.getElementById("leaveType").value;
     const start = document.getElementById("startDate").value;
     const end = document.getElementById("endDate").value;
+    const reason = document.getElementById("reason").value.trim();
 
     if (end < start) {
         alert("End date must be on or after the start date.");
@@ -520,15 +569,18 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
         type,
         start,
         end,
+        reason,
         status: "Pending"
     };
 
     const success = await sendToGoogleScript(newRequest);
 
     if (success) {
-        alert("Leave request submitted successfully to Google Sheets!");
+        alert("Leave request submitted successfully!");
         this.reset();
-        setTimeout(fetchDataFromSheet, 1500);
+        if(!isFormMode) {
+            setTimeout(fetchDataFromSheet, 1500);
+        }
     } else {
         alert("May naganap na error sa pag-save. Pakisubukan muli.");
     }
@@ -538,11 +590,14 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
 });
 
 // Initial setup
-fetchDataFromSheet();
-updateAdminUI();
-
-// Awtomatikong mag-update ng data mula sa Google Sheets tuwing 30 segundo
-setInterval(fetchDataFromSheet, 30000);
+if (!isFormMode) {
+    fetchDataFromSheet();
+    updateAdminUI();
+    setInterval(fetchDataFromSheet, 30000);
+} else {
+    // Kung form mode, i-hide ang admin status display sa taas kung meron man
+    updateAdminUI();
+}
 </script>
 
 </body>
