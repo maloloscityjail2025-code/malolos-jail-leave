@@ -9,10 +9,6 @@
 <style>
 * { box-sizing: border-box; }
 body { margin: 0; font-family: Tahoma, sans-serif; background: #f1f5f9; color: #1e293b; }
-/* ... rest of your styles remain identical ... */
-</style>
-* { box-sizing: border-box; }
-body { margin: 0; font-family: Tahoma, sans-serif; background: #f1f5f9; color: #1e293b; }
 header { background: #172554; color: white; padding: 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 .header-left { display: flex; align-items: center; gap: 15px; }
 .logo-container { display: flex; align-items: center; gap: 10px; }
@@ -100,9 +96,12 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 <section id="dashboard">
     <h2>Dashboard Overview</h2>
     <div class="cards">
-        <div class="card">
+        <div class="card" style="position: relative;">
             <h3>TOTAL PERSONNEL</h3>
-            <div class="number" id="totalPersonnel">38</div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="number" id="totalPersonnel" style="cursor: pointer;" title="I-click para palitan ang bilang" onclick="editTotalPersonnel()">38</div>
+                <button id="editPersonnelBtn" onclick="editTotalPersonnel()" style="display: none; padding: 4px 8px; font-size: 11px; background: #0284c7; margin: 0;">Palitan</button>
+            </div>
         </div>
         <div class="card">
             <h3>PENDING REQUESTS</h3>
@@ -231,22 +230,49 @@ const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3qNLH4KncAL
 let requests = [];
 let isAdmin = localStorage.getItem("malolos_admin") === "true";
 
+// Total Personnel Count Setup
+let totalPersonnelCount = localStorage.getItem("malolos_total_personnel") || 38;
+document.getElementById("totalPersonnel").textContent = totalPersonnelCount;
+
+function editTotalPersonnel() {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mabago ang bilang ng Total Personnel.");
+        return;
+    }
+    
+    const newCount = prompt("Ilagay ang bagong bilang ng Total Personnel:", totalPersonnelCount);
+    if (newCount !== null && newCount.trim() !== "") {
+        const parsed = parseInt(newCount, 10);
+        if (!isNaN(parsed) && parsed >= 0) {
+            totalPersonnelCount = parsed;
+            localStorage.setItem("malolos_total_personnel", totalPersonnelCount);
+            document.getElementById("totalPersonnel").textContent = totalPersonnelCount;
+            alert("Matagumpay na na-update ang Total Personnel!");
+        } else {
+            alert("Mangyaring maglagay ng wastong numero.");
+        }
+    }
+}
+
 // Update UI state based on admin login
 function updateAdminUI() {
     const statusDisplay = document.getElementById("adminStatusDisplay");
     const authBtn = document.getElementById("adminAuthBtn");
     const actionBadge = document.getElementById("actionHeaderBadge");
+    const editPersonnelBtn = document.getElementById("editPersonnelBtn");
 
     if (isAdmin) {
         statusDisplay.innerHTML = '<span class="admin-badge">ADMIN MODE</span>';
         authBtn.textContent = "Logout Admin";
         authBtn.style.background = "#dc2626";
         if(actionBadge) actionBadge.style.display = "none";
+        if(editPersonnelBtn) editPersonnelBtn.style.display = "inline-block";
     } else {
         statusDisplay.textContent = "Viewer Mode";
         authBtn.textContent = "Admin Login";
         authBtn.style.background = "#0284c7";
         if(actionBadge) actionBadge.style.display = "inline";
+        if(editPersonnelBtn) editPersonnelBtn.style.display = "none";
     }
     renderTable();
 }
