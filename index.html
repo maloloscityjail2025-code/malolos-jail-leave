@@ -81,7 +81,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 <nav id="mainNav">
     <div class="nav-links">
         <a href="#dashboard">Dashboard</a>
-        <a href="#leaveFormSection">File Leave</a>
+        <a href="#leaveFormSection" id="navFileLeaveLink">File Leave</a>
         <a href="#qrSection">QR Code & Online Filing</a>
         <a href="#requests">Leave Requests</a>
         <a href="#summary">Leave Summary</a>
@@ -135,7 +135,8 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     </div>
 </section>
 
-<section class="panel" id="leaveFormSection">
+<!-- Leave Form Section (Nakatago sa Admin Dashboard, lilitaw lang sa QR scan) -->
+<section class="panel" id="leaveFormSection" style="display: none;">
     <h2 id="formTitleHeader">File Leave Request (Para sa Tauhan)</h2>
     <form id="leaveForm">
         <div>
@@ -281,7 +282,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const isFormMode = urlParams.get('mode') === 'form';
 
 if (isFormMode) {
-    // Itago ang buong dashboard, nav, header, at iba pang sections
+    // Itago ang dashboard, nav, header, requests table, at iba pa
     document.getElementById("mainHeader").style.display = "none";
     document.getElementById("mainNav").style.display = "none";
     document.getElementById("dashboard").style.display = "none";
@@ -290,8 +291,14 @@ if (isFormMode) {
     document.getElementById("summary").style.display = "none";
     document.getElementById("mainFooter").style.display = "none";
     
-    // Baguhin ang pamagat ng form para maging angkop sa mobile view ng mga tauhan
+    // Ipakita ang Leave Form para sa mga tauhan
+    document.getElementById("leaveFormSection").style.display = "block";
     document.getElementById("formTitleHeader").textContent = "Malolos City Jail - Online Leave Filing Form";
+} else {
+    // Kung nasa admin/viewer dashboard, itago ang leave form
+    document.getElementById("leaveFormSection").style.display = "none";
+    const navFileLeave = document.getElementById("navFileLeaveLink");
+    if(navFileLeave) navFileLeave.style.display = "none";
 }
 
 // Update UI state based on admin login
@@ -569,7 +576,7 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
     const newRequest = {
         action: "add",
         id: Date.now(),
-    	name,
+        name,
         employeeId,
         department,
         type,
