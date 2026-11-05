@@ -28,7 +28,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #93c5fd;border-color:#
 label{display:block;font-size:12px;font-weight:700;color:#475569;margin:0 0 5px}.field{min-width:0}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.formgrid .wide{grid-column:1/-1}
 .toolbar{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:9px;align-items:end;margin-bottom:12px}
 .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;min-width:930px}th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:12px;vertical-align:top}th{background:#eff6ff;color:#173b7a;position:sticky;top:0;z-index:1}tr:last-child td{border-bottom:0}.status{font-size:10px;font-weight:800;text-transform:uppercase;padding:4px 7px;border-radius:20px;display:inline-block}.Pending{background:#fef3c7;color:#92400e}.Approved{background:#dcfce7;color:#166534}.Rejected{background:#fee2e2;color:#991b1b}
-.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{padding:6px 8px;font-size:11px}.qrbox{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#f8fafc;border:1px dashed #cbd5e1;padding:15px;border-radius:9px}#qrcode{background:#fff;padding:8px;border-radius:6px;min-width:136px;min-height:136px;display:flex;align-items:center;justify-content:center}
+.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{padding:6px 8px;font-size:11px}.qrbox{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#f8fafc;border:1px dashed #cbd5e1;padding:15px;border-radius:9px}#qrcode{background:#fff;padding:8px;border-radius:6px;min-width:136px;min-height:136px}
 .summarygrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.summaryitem{padding:12px;background:#f8fafc;border-radius:8px}.summaryitem strong{display:block;font-size:22px;color:#1d4ed8}
 .notice{padding:11px 13px;border-radius:8px;background:#eff6ff;color:#1e40af;margin-bottom:14px}.error{background:#fef2f2;color:#991b1b}.successnote{background:#f0fdf4;color:#166534}
 .modal{position:fixed;inset:0;background:#0f172a99;display:flex;align-items:center;justify-content:center;padding:15px;z-index:10}.modalbox{background:white;padding:22px;border-radius:12px;width:min(440px,100%);box-shadow:0 12px 35px #0003}.modalbox h3{font-size:18px;color:var(--navy)}
@@ -91,10 +91,10 @@ footer{text-align:center;color:#64748b;padding:20px;font-size:11px}
       <div><label for="searchInput">Search personnel / ID</label><input id="searchInput" placeholder="Search name or employee ID"></div>
       <div><label for="statusFilter">Status</label><select id="statusFilter"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select></div>
       <div><label for="typeFilter">Leave type</label><select id="typeFilter"><option value="">All leave types</option><option>Vacation</option><option>Sick</option><option>Emergency</option><option>Personal</option><option>Other</option></select></div>
-      <div><label> </label><button id="clearFilters" class="secondary" type="button">Clear Filters</button></div>
+      <div><label>&nbsp;</label><button id="clearFilters" class="secondary" type="button">Clear Filters</button></div>
     </div>
-    <div id="connectionMessage" class="notice hidden"></div>
-    <div class="tablewrap"><table><thead><tr><th>Personnel</th><th>Department</th><th>Leave Type</th><th>Inclusive Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leaveTable"><tr><td colspan="8" class="muted">Loading records…</td></tr></tbody></table></div>
+    <div id="connectionMessage" class="notice">Connect the Google Apps Script endpoint in the configuration before using live records.</div>
+    <div class="tablewrap"><table><thead><tr><th>Personnel</th><th>Department</th><th>Leave Type</th><th>Inclusive Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leaveTable"><tr><td colspan="8" class="muted">No records loaded.</td></tr></tbody></table></div>
   </section>
 
   <section class="panel" id="summaryPanel">
@@ -118,39 +118,33 @@ footer{text-align:center;color:#64748b;padding:20px;font-size:11px}
  <div class="modalbox"><h3 id="personnelTitle">Personnel Record</h3><form id="personnelForm" class="formgrid">
  <div class="field wide"><label>Name *</label><input id="pName" required></div><div class="field"><label>Employee ID *</label><input id="pId" required></div>
  <div class="field"><label>Department *</label><input id="pDepartment" required></div><div class="field"><label>Vacation Leave Credits</label><input id="pVacation" type="number" min="0" step=".5" value="0"></div>
- <div class="field"><label>Sick Credits</label><input id="pSick" type="number" min="0" step=".5" value="0"></div>
+ <div class="field"><label>Sick Leave Credits</label><input id="pSick" type="number" min="0" step=".5" value="0"></div>
  <div class="wide" style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="secondary" id="cancelPersonnel">Cancel</button><button type="submit">Save Record</button></div></form></div>
 </div>
-
 <script>
-/* Cloudflare Worker URL Endpoint */
-const API_URL = "https://little-surf-013a.riirimaloloscj.workers.dev";
+/* CONFIGURATION: paste your deployed Google Apps Script Web App URL below. */
+const API_URL = "PASTE_YOUR_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 const POLL_INTERVAL_MS = 60000;
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const formMode = params.get("mode") === "form";
-let requests = [], personnel = [], totalPersonnel = 38, adminToken = sessionStorage.getItem("mcj_admin_token") || "";
+let requests = [], personnel = [], totalPersonnel = 0, adminToken = sessionStorage.getItem("mcj_admin_token") || "";
 let editingPersonnelId = null, busy = false;
 
-function safe(v){return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&","<":"<",">":">",'"':""","'":"'"}[c]));}
+function safe(v){return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function dateLabel(v){if(!v)return "—";const d=new Date(v+"T00:00:00");return isNaN(d)?safe(v):d.toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"});}
 function daysBetween(a,b){if(!a||!b)return 0;const x=new Date(a+"T00:00:00"),y=new Date(b+"T00:00:00");return Math.max(0,Math.round((y-x)/86400000)+1);}
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
 function setNotice(el,msg,type=""){el.textContent=msg;el.className="notice"+(type?" "+type:"");el.classList.remove("hidden");}
-
+function apiConfigured(){return API_URL.startsWith("https://script.google.com/") && !API_URL.includes("PASTE_YOUR");}
 async function api(action,data={},admin=false){
+ if(!apiConfigured()) throw new Error("Google Apps Script URL is not configured.");
  const payload={action,...data}; if(admin)payload.token=adminToken;
- const response=await fetch(API_URL,{
-   method:"POST",
-   headers:{"Content-Type":"text/plain;charset=utf-8"},
-   body:JSON.stringify(payload)
- });
+ const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
  if(!response.ok)throw new Error("Server returned HTTP "+response.status);
- const result=await response.json(); 
- if(result.ok === false)throw new Error(result.error||"Request failed.");
+ const result=await response.json(); if(!result.ok)throw new Error(result.error||"Request failed.");
  return result;
 }
-
 function setAdminUI(){
  $("modeLabel").textContent=adminToken?"ADMIN MODE":"VIEWER MODE";
  $("loginBtn").textContent=adminToken?"Admin Logout":"Admin Login";
@@ -158,57 +152,34 @@ function setAdminUI(){
  document.querySelectorAll(".admin-only").forEach(el=>el.classList.toggle("hidden",!adminToken));
  renderTable(); renderPersonnel();
 }
-
-function showLogin(){
- if(adminToken){
-   if(confirm("Log out of administrator mode?")){
-     adminToken="";sessionStorage.removeItem("mcj_admin_token");setAdminUI();loadData();
-   }
- }else{
-   $("loginModal").classList.remove("hidden");$("adminPassword").value="";$("loginError").textContent="";$("adminPassword").focus();
- }
-}
-
+function showLogin(){if(adminToken){if(confirm("Log out of administrator mode?")){adminToken="";sessionStorage.removeItem("mcj_admin_token");setAdminUI();loadData();}}else{$("loginModal").classList.remove("hidden");$("adminPassword").value="";$("loginError").textContent="";$("adminPassword").focus();}}
 async function login(){
  const password=$("adminPassword").value;
- try{
-   const r=await api("login",{password});
-   adminToken=r.token||"authorized_admin_token";
-   sessionStorage.setItem("mcj_admin_token",adminToken);
-   $("loginModal").classList.add("hidden");
-   setAdminUI();
-   await loadData();
- }catch(e){
-   $("loginError").textContent=e.message;
- }
+ try{const r=await api("login",{password});adminToken=r.token;sessionStorage.setItem("mcj_admin_token",adminToken);$("loginModal").classList.add("hidden");setAdminUI();await loadData();}
+ catch(e){$("loginError").textContent=e.message;}
 }
-
 async function loadData(){
  if(formMode)return;
  try{
-  const r = await api("list",{},!!adminToken);
-  requests = Array.isArray(r.requests)?r.requests:(Array.isArray(r)?r:[]);
-  personnel = Array.isArray(r.personnel)?r.personnel:[]; 
-  totalPersonnel = Number(r.totalPersonnel||personnel.length||38);
-  
+  const r=await api("list",{},!!adminToken);
+  requests=Array.isArray(r.requests)?r.requests:[];
+  personnel=Array.isArray(r.personnel)?r.personnel:[]; totalPersonnel=Number(r.totalPersonnel||personnel.length||0);
   $("connectionMessage").classList.add("hidden");
   $("lastUpdated").textContent="Last updated: "+new Date().toLocaleTimeString("en-PH");
   renderTable();renderDashboard();renderPersonnel();
  }catch(e){
   if(adminToken && /auth|token|session/i.test(e.message)){adminToken="";sessionStorage.removeItem("mcj_admin_token");setAdminUI();}
-  setNotice($("connectionMessage"),"Error loading data: " + e.message,"error");
+  setNotice($("connectionMessage"),e.message,"error");
  }
 }
-
 function renderDashboard(){
- $("totalPersonnel").textContent=totalPersonnel || "38";
+ $("totalPersonnel").textContent=totalPersonnel || "0";
  $("pendingCount").textContent=requests.filter(x=>x.status==="Pending").length;
  $("approvedCount").textContent=requests.filter(x=>x.status==="Approved").length;
  $("onLeaveCount").textContent=requests.filter(x=>x.status==="Approved"&&x.start<=today()&&x.end>=today()).length;
  const types=["Vacation","Sick","Emergency","Personal","Other"];
  $("leaveSummary").innerHTML=types.map(t=>`<div class="summaryitem"><span>${safe(t)} Leave</span><strong>${requests.filter(x=>x.type===t).length}</strong><span class="muted small">request(s)</span></div>`).join("");
 }
-
 function renderTable(){
  const term=$("searchInput").value.toLowerCase().trim(),status=$("statusFilter").value,type=$("typeFilter").value;
  const rows=requests.filter(r=>(!term||String(r.name||"").toLowerCase().includes(term)||String(r.employeeId||"").toLowerCase().includes(term))&&(!status||r.status===status)&&(!type||r.type===type));
@@ -218,59 +189,27 @@ function renderTable(){
  <td>${adminToken?safe(r.reason||"—"):'<span class="muted">Admin only</span>'}</td><td><span class="status ${safe(r.status)}">${safe(r.status)}</span></td>
  <td>${adminToken?`<div class="actions">${r.status==="Pending"?`<button class="success" data-action="approve" data-id="${safe(r.id)}">Approve</button><button class="danger" data-action="reject" data-id="${safe(r.id)}">Reject</button>`:`<button class="secondary" data-action="delete" data-id="${safe(r.id)}">Delete</button>`}</div>`:'<span class="muted">Restricted</span>'}</td></tr>`).join(""):`<tr><td colspan="8" class="muted">No leave requests found.</td></tr>`;
 }
-
 async function changeRequest(id,action){
  if(!adminToken)return alert("Administrator login required.");
  if(action==="delete"&&!confirm("Permanently delete this leave request?"))return;
  try{await api(action,{id},true);await loadData();}catch(e){alert(e.message);}
 }
-
 function renderPersonnel(){
  if(!$("personnelTable"))return;
  $("personnelTable").innerHTML=personnel.length?personnel.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.employeeId)}</td><td>${safe(p.department)}</td><td>${Number(p.vacationCredits||0)}</td><td>${Number(p.sickCredits||0)}</td><td><button class="soft" data-edit-person="${safe(p.employeeId)}">Edit</button> <button class="danger" data-delete-person="${safe(p.employeeId)}">Delete</button></td></tr>`).join(""):`<tr><td colspan="6" class="muted">No personnel records yet.</td></tr>`;
 }
-
 function openPersonnel(p=null){
  editingPersonnelId=p?p.employeeId:null;$("personnelTitle").textContent=p?"Edit Personnel":"Add Personnel";
  $("pName").value=p?.name||"";$("pId").value=p?.employeeId||"";$("pId").disabled=!!p;$("pDepartment").value=p?.department||"";
  $("pVacation").value=p?.vacationCredits??0;$("pSick").value=p?.sickCredits??0;$("personnelModal").classList.remove("hidden");
 }
-
 async function submitPersonnel(e){
  e.preventDefault();try{await api("savePersonnel",{personnel:{name:$("pName").value.trim(),employeeId:$("pId").value.trim(),department:$("pDepartment").value.trim(),vacationCredits:Number($("pVacation").value),sickCredits:Number($("pSick").value)}},true);$("personnelModal").classList.add("hidden");await loadData();}catch(err){alert(err.message);}
 }
-
 function initQR(){
- const link = location.href.split("?")[0].split("#")[0] + "?mode=form";
- const shareableInput = $("shareableLink");
- if(shareableInput) shareableInput.value = link;
- 
- const qrContainer = $("qrcode");
- if(qrContainer){
-   qrContainer.innerHTML = "";
-   if(window.QRCode){
-     try {
-       new QRCode(qrContainer, {
-         text: link,
-         width: 120,
-         height: 120,
-         colorDark: "#000000",
-         colorLight: "#ffffff",
-         correctLevel: QRCode.CorrectLevel.H
-       });
-     } catch(err) {
-       console.error("QR Generation failed:", err);
-     }
-   }
- }
+ const link=location.href.split("?")[0].split("#")[0]+"?mode=form";$("shareableLink").value=link;
+ if(window.QRCode)new QRCode($("qrcode"),{text:link,width:120,height:120});
 }
-
-if(document.readyState === "complete" || document.readyState === "interactive") {
-  initQR();
-} else {
-  window.addEventListener("DOMContentLoaded", initQR);
-}
-
 $("leaveForm").addEventListener("submit",async e=>{
  e.preventDefault();const btn=$("submitBtn");if(busy)return;
  const start=$("startDate").value,end=$("endDate").value;if(end<start){setNotice($("formMessage"),"Date To must be on or after Date From.","error");return;}
@@ -280,7 +219,6 @@ $("leaveForm").addEventListener("submit",async e=>{
  catch(err){setNotice($("formMessage"),err.message,"error");}
  finally{busy=false;btn.disabled=false;btn.textContent="Submit Leave Request";}
 });
-
 $("leaveTable").addEventListener("click",e=>{const b=e.target.closest("button[data-action]");if(b)changeRequest(b.dataset.id,b.dataset.action);});
 $("personnelTable").addEventListener("click",e=>{const edit=e.target.closest("[data-edit-person]"),del=e.target.closest("[data-delete-person]");if(edit)openPersonnel(personnel.find(p=>p.employeeId===edit.dataset.editPerson));if(del&&confirm("Delete this personnel record?"))api("deletePersonnel",{employeeId:del.dataset.deletePerson},true).then(loadData).catch(x=>alert(x.message));});
 $("loginBtn").addEventListener("click",showLogin);$("confirmLogin").addEventListener("click",login);$("cancelLogin").addEventListener("click",()=>$("loginModal").classList.add("hidden"));
@@ -290,15 +228,8 @@ $("copyLinkBtn").addEventListener("click",async()=>{try{await navigator.clipboar
 $("clearFilters").addEventListener("click",()=>{$("searchInput").value="";$("statusFilter").value="";$("typeFilter").value="";renderTable();});
 ["searchInput","statusFilter","typeFilter"].forEach(id=>$(id).addEventListener("input",renderTable));
 $("addPersonnelBtn").addEventListener("click",()=>openPersonnel());$("cancelPersonnel").addEventListener("click",()=>$("personnelModal").classList.add("hidden"));$("personnelForm").addEventListener("submit",submitPersonnel);
-
-if(formMode){
- $("siteHeader").classList.add("hidden");$("siteNav").classList.add("hidden");$("dashboard").classList.add("hidden");$("qrPanel").classList.add("hidden");$("requestsPanel").classList.add("hidden");$("summaryPanel").classList.add("hidden");$("personnelPanel").classList.add("hidden");$("leaveFormPanel").classList.remove("hidden");$("formModeNotice").classList.remove("hidden");$("formHeading").textContent="Malolos City Jail — Online Leave Application";
-}else{
- $("leaveFormPanel").classList.add("hidden");
- setAdminUI();
- loadData();
- setInterval(loadData, POLL_INTERVAL_MS);
-}
+if(formMode){$("siteHeader").classList.add("hidden");$("siteNav").classList.add("hidden");$("dashboard").classList.add("hidden");$("qrPanel").classList.add("hidden");$("requestsPanel").classList.add("hidden");$("summaryPanel").classList.add("hidden");$("personnelPanel").classList.add("hidden");$("leaveFormPanel").classList.remove("hidden");$("formModeNotice").classList.remove("hidden");$("formHeading").textContent="Malolos City Jail — Online Leave Application";}
+else{$("leaveFormPanel").classList.add("hidden");initQR();setAdminUI();loadData();setInterval(loadData,POLL_INTERVAL_MS);}
 </script>
 </body>
 </html>
