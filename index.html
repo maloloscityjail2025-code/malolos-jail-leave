@@ -67,7 +67,7 @@ footer{text-align:center;color:#64748b;padding:20px;font-size:11px}
   <section class="panel" id="qrPanel">
     <div class="panel-head"><h2>QR Code & Online Leave Filing</h2><button type="button" class="soft no-print" id="copyLinkBtn">Copy Filing Link</button></div>
     <p class="muted">Scan the QR code using a smartphone camera to open the online leave application form. Share the link only through authorized channels.</p>
-    <div class="qrbox"><div id="qrcode"></div><div style="min-width:min(100%,320px);flex:1"><label>Direct Online Filing Link</label><input id="shareableLink" readonly><p class="small muted">The page must be hosted on a publicly accessible HTTPS website for personnel to use this link.</p></div></div>
+    <div class="qrbox"><div id="qrcode"></div><div style="min-width:min(100%,320px);flex:1"><label>Direct Online Filing Link</label><input id="shareableLink" readonly><p class="small muted" id="hostingNotice">The page must be hosted on a publicly accessible HTTPS website for personnel to use this link.</p></div></div>
   </section>
 
   <section class="panel hidden" id="leaveFormPanel">
@@ -245,6 +245,11 @@ function initQR(){
  const shareableInput = $("shareableLink");
  if(shareableInput) shareableInput.value = link;
  
+ if(location.protocol === "file:") {
+   const notice = $("hostingNotice");
+   if(notice) notice.textContent = "⚠️ Naka-open bilang local file. Para ma-scan ng totoong phone camera, kailangang i-upload ito sa pampublikong website (e.g. GitHub Pages).";
+ }
+
  const qrContainer = $("qrcode");
  if(qrContainer){
    qrContainer.innerHTML = "";
@@ -265,10 +270,10 @@ function initQR(){
  }
 }
 
-if(document.readyState === "complete" || document.readyState === "interactive") {
-  initQR();
+if(document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initQR);
 } else {
-  window.addEventListener("DOMContentLoaded", initQR);
+  initQR();
 }
 
 $("leaveForm").addEventListener("submit",async e=>{
