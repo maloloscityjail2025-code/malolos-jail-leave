@@ -8,14 +8,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{--navy:#102a56;--blue:#1d4ed8;--light:#eff6ff;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--bg:#f3f6fb;--green:#15803d;--red:#b91c1c;--amber:#b45309}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:28px/1.5 Tahoma,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Tahoma,Arial,sans-serif}
 header{background:linear-gradient(115deg,#102a56,#1e40af);color:#fff;padding:20px clamp(16px,3vw,36px);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:15px}.logos{display:flex;gap:8px}.logos img,.right-logo img{width:68px;height:68px;object-fit:contain}.brand h1{font-size:clamp(18px,2vw,25px);margin:0 0 4px}.brand p{margin:0;color:#dbeafe}
 nav{background:#173b7a;padding:10px clamp(16px,3vw,36px);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .navlinks{display:flex;gap:6px;flex-wrap:wrap}nav a{color:#eaf2ff;text-decoration:none;padding:9px 11px;border-radius:7px;font-weight:700;font-size:13px}nav a:hover,nav a.active{background:#ffffff20}
-.navright{display:flex;align-items:center;gap:10px;color:#dbeafe;font-size:22px}
+.navright{display:flex;align-items:center;gap:10px;color:#dbeafe;font-size:12px}
 main{max-width:1480px;margin:auto;padding:24px clamp(12px,2vw,28px)}
-h2{font-size:20px;margin:0 0 16px;color:#142b52}h3{margin:0 0 10px;font-size:28px}
+h2{font-size:20px;margin:0 0 16px;color:#142b52}h3{margin:0 0 10px;font-size:14px}
 .muted{color:var(--muted)}.small{font-size:12px}.hidden{display:none!important}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
 .card,.panel{background:#fff;border:1px solid #e8edf5;border-radius:12px;box-shadow:0 3px 12px #0f172a08}
@@ -91,9 +91,9 @@ footer{text-align:center;color:#64748b;padding:20px;font-size:11px}
       <div><label for="searchInput">Search personnel / ID</label><input id="searchInput" placeholder="Search name or employee ID"></div>
       <div><label for="statusFilter">Status</label><select id="statusFilter"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select></div>
       <div><label for="typeFilter">Leave type</label><select id="typeFilter"><option value="">All leave types</option><option>Vacation</option><option>Sick</option><option>Emergency</option><option>Personal</option><option>Other</option></select></div>
-      <div><label> </label><button id="clearFilters" class="secondary" type="button">Clear Filters</button></div>
+      <div><label>&nbsp;</label><button id="clearFilters" class="secondary" type="button">Clear Filters</button></div>
     </div>
-    <div id="connectionMessage" class="notice hidden">Connect the Google Apps Script endpoint in the configuration before using live records.</div>
+    <div id="connectionMessage" class="notice">Connect the Google Apps Script endpoint in the configuration before using live records.</div>
     <div class="tablewrap"><table><thead><tr><th>Personnel</th><th>Department</th><th>Leave Type</th><th>Inclusive Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leaveTable"><tr><td colspan="8" class="muted">No records loaded.</td></tr></tbody></table></div>
   </section>
 
@@ -122,8 +122,8 @@ footer{text-align:center;color:#64748b;padding:20px;font-size:11px}
  <div class="wide" style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="secondary" id="cancelPersonnel">Cancel</button><button type="submit">Save Record</button></div></form></div>
 </div>
 <script>
-/* Cloudflare Worker API URL */
-const API_URL = "https://little-surf-013a.riirimaloloscj.workers.dev";
+/* CONFIGURATION: paste your deployed Google Apps Script Web App URL below. */
+const API_URL = "PASTE_YOUR_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 const POLL_INTERVAL_MS = 60000;
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -131,12 +131,12 @@ const formMode = params.get("mode") === "form";
 let requests = [], personnel = [], totalPersonnel = 0, adminToken = sessionStorage.getItem("mcj_admin_token") || "";
 let editingPersonnelId = null, busy = false;
 
-function safe(v){return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&","<":"<",">":">",'"':""","'":"'"}[c]));}
+function safe(v){return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function dateLabel(v){if(!v)return "—";const d=new Date(v+"T00:00:00");return isNaN(d)?safe(v):d.toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"});}
 function daysBetween(a,b){if(!a||!b)return 0;const x=new Date(a+"T00:00:00"),y=new Date(b+"T00:00:00");return Math.max(0,Math.round((y-x)/86400000)+1);}
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
 function setNotice(el,msg,type=""){el.textContent=msg;el.className="notice"+(type?" "+type:"");el.classList.remove("hidden");}
-function apiConfigured(){return API_URL.startsWith("https://") && !API_URL.includes("PASTE_YOUR");}
+function apiConfigured(){return API_URL.startsWith("https://script.google.com/") && !API_URL.includes("PASTE_YOUR");}
 async function api(action,data={},admin=false){
  if(!apiConfigured()) throw new Error("Google Apps Script URL is not configured.");
  const payload={action,...data}; if(admin)payload.token=adminToken;
