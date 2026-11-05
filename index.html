@@ -88,7 +88,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     </div>
     <div>
         <span id="adminStatusDisplay" style="color: #cbd5e1; font-size: 13px; margin-right: 10px;">Viewer Mode</span>
-        <button id="adminAuthBtn" onclick="toggleAdminModal()" style="background: #0284c7; padding: 6px 12px; font-size: 13px;">Admin Login</button>
+        <button id="adminAuthBtn" type="button" onclick="toggleAdminModal()" style="background: #0284c7; padding: 6px 12px; font-size: 13px;">Admin Login</button>
     </div>
 </nav>
 
@@ -101,7 +101,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
             <h3>TOTAL PERSONNEL</h3>
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div class="number" id="totalPersonnel" style="cursor: pointer;" title="I-click para palitan ang bilang" onclick="editTotalPersonnel()">38</div>
-                <button id="editPersonnelBtn" onclick="editTotalPersonnel()" style="display: none; padding: 4px 8px; font-size: 11px; background: #0284c7; margin: 0;">Palitan</button>
+                <button id="editPersonnelBtn" type="button" onclick="editTotalPersonnel()" style="display: none; padding: 4px 8px; font-size: 11px; background: #0284c7; margin: 0;">Palitan</button>
             </div>
         </div>
         <div class="card">
@@ -201,7 +201,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
             <option>Personal</option>
             <option>Other</option>
         </select>
-        <button onclick="fetchDataFromSheet(true)" style="background: #0284c7;">↻ Refresh Data</button>
+        <button type="button" onclick="fetchDataFromSheet(true)" style="background: #0284c7;">↻ Refresh Data</button>
     </div>
     <table>
         <thead>
@@ -330,13 +330,13 @@ function toggleAdminModal() {
         }
     } else {
         const modal = document.getElementById("adminModal");
-        modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+        modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
         document.getElementById("adminPasswordInput").value = "";
     }
 }
 
 function verifyAdmin() {
-    const pass = document.getElementById("adminPasswordInput").value;
+    const pass = document.getElementById("adminPasswordInput").value.trim();
     if (pass === "malolos2026") {
         isAdmin = true;
         localStorage.setItem("malolos_admin", "true");
@@ -485,10 +485,10 @@ function renderTable() {
                 <td>
                     ${isAdmin ? (
                         r.status === "Pending" ? `
-                            <button class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
-                            <button class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
+                            <button type="button" class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
+                            <button type="button" class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
                         ` : `
-                            <button class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
+                            <button type="button" class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
                         `
                     ) : '<span style="color:#94a3b8; font-size:12px; font-style:italic;">Restricted (Admin Only)</span>'}
                 </td>
