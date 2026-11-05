@@ -88,7 +88,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
     </div>
     <div>
         <span id="adminStatusDisplay" style="color: #cbd5e1; font-size: 13px; margin-right: 10px;">Viewer Mode</span>
-        <button id="adminAuthBtn" type="button" onclick="toggleAdminModal()" style="background: #0284c7; padding: 6px 12px; font-size: 13px;">Admin Login</button>
+        <button id="adminAuthBtn" onclick="toggleAdminModal()" style="background: #0284c7; padding: 6px 12px; font-size: 13px;">Admin Login</button>
     </div>
 </nav>
 
@@ -101,7 +101,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
             <h3>TOTAL PERSONNEL</h3>
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div class="number" id="totalPersonnel" style="cursor: pointer;" title="I-click para palitan ang bilang" onclick="editTotalPersonnel()">38</div>
-                <button id="editPersonnelBtn" type="button" onclick="editTotalPersonnel()" style="display: none; padding: 4px 8px; font-size: 11px; background: #0284c7; margin: 0;">Palitan</button>
+                <button id="editPersonnelBtn" onclick="editTotalPersonnel()" style="display: none; padding: 4px 8px; font-size: 11px; background: #0284c7; margin: 0;">Palitan</button>
             </div>
         </div>
         <div class="card">
@@ -122,7 +122,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 <!-- QR Code Section -->
 <section class="panel" id="qrSection">
     <h2>Online & QR Code Leave Filing</h2>
-    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form.</p>
+    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form[cite: 3].</p>
     
     <div class="qr-section">
         <div id="qrcode"></div>
@@ -201,7 +201,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
             <option>Personal</option>
             <option>Other</option>
         </select>
-        <button type="button" onclick="fetchDataFromSheet(true)" style="background: #0284c7;">↻ Refresh Data</button>
+        <button onclick="fetchDataFromSheet(true)" style="background: #0284c7;">↻ Refresh Data</button>
     </div>
     <table>
         <thead>
@@ -246,11 +246,11 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1CpBEEL098rOSxEXP5WjfeAQxBOZth--ZdqV1TDQGw7b6-sqRX86mVT-63U1ObXiyxg/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3qNLH4KncALbDhaSjrwroQRi6U9feC0DNdfBs3njCONiaYY6qbBwQvdC01plpRNBi_A/exec";
 
 let requests = [];
 let isAdmin = localStorage.getItem("malolos_admin") === "true";
-let isBusyUpdating = false;
+let isBusyUpdating = false; // Pigilan ang auto-refresh habang nagpapadala ng action
 
 let totalPersonnelCount = localStorage.getItem("malolos_total_personnel") || 38;
 const totalPersonnelEl = document.getElementById("totalPersonnel");
@@ -330,13 +330,13 @@ function toggleAdminModal() {
         }
     } else {
         const modal = document.getElementById("adminModal");
-        modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
+        modal.style.display = modal.style.display === "flex" ? "none" : "flex";
         document.getElementById("adminPasswordInput").value = "";
     }
 }
 
 function verifyAdmin() {
-    const pass = document.getElementById("adminPasswordInput").value.trim();
+    const pass = document.getElementById("adminPasswordInput").value;
     if (pass === "malolos2026") {
         isAdmin = true;
         localStorage.setItem("malolos_admin", "true");
@@ -362,7 +362,7 @@ async function fetchDataFromSheet(forceRefresh = false) {
     }
 }
 
-const baseSiteUrl = window.location.href ? window.location.href.split('?')[0].split('#')[0] : "";
+const baseSiteUrl = window.location.href.split('?')[0].split('#')[0];
 const qrTargetUrl = baseSiteUrl + "?mode=form";
 const shareableLinkInput = document.getElementById("shareableLink");
 if(shareableLinkInput) shareableLinkInput.value = qrTargetUrl;
@@ -391,11 +391,11 @@ function copyLink() {
 
 function escapeHTML(value) {
     return String(value || "").replace(/[&<>"']/g, char => ({
-        "&": "&",
-        "<": "<",
-        ">": ">",
-        '"': """,
-        "'": "'"
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
     })[char]);
 }
 
@@ -479,16 +479,16 @@ function renderTable() {
                 <td>${escapeHTML(r.type)}</td>
                 <td>${formatDate(r.start)}</td>
                 <td>${formatDate(r.end)}</td>
-                <td>${isAdmin ? escapeHTML(r.reason || r.Reason || '-') : '<span style="color:#94a3b8; font-style:italic;">Hidden (Admin Only)</span>'}</td>
+                <td>${escapeHTML(r.reason || '-')}</td>
                 <td>${calculateDays(r.start, r.end)} day(s)</td>
                 <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
                 <td>
                     ${isAdmin ? (
                         r.status === "Pending" ? `
-                            <button type="button" class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
-                            <button type="button" class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
+                            <button class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
+                            <button class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
                         ` : `
-                            <button type="button" class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
+                            <button class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
                         `
                     ) : '<span style="color:#94a3b8; font-size:12px; font-style:italic;">Restricted (Admin Only)</span>'}
                 </td>
@@ -522,10 +522,11 @@ async function changeStatus(id, status) {
         return;
     }
     
+    // Tiyaking String comparison ang gamit sa id
     const request = requests.find(r => String(r.id) === String(id));
     if (!request) return;
     
-    isBusyUpdating = true;
+    isBusyUpdating = true; // Temporary lock sa auto-refresh
     request.status = status;
     renderTable();
 
@@ -543,7 +544,7 @@ async function deleteRequest(id) {
     }
     if (!confirm("Are you sure you want to delete this leave request?")) return;
     
-    isBusyUpdating = true;
+    isBusyUpdating = true; // Temporary lock sa auto-refresh
     requests = requests.filter(r => String(r.id) !== String(id));
     renderTable();
 
@@ -556,7 +557,6 @@ async function deleteRequest(id) {
 
 document.getElementById("leaveForm").addEventListener("submit", async function(event) {
     event.preventDefault();
-    const form = event.target;
 
     const submitBtn = document.getElementById("submitBtn");
     submitBtn.disabled = true;
@@ -594,7 +594,7 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
 
     if (success) {
         alert("Leave request submitted successfully!");
-        form.reset();
+        this.reset();
     } else {
         alert("May naganap na error sa pag-save. Pakisubukan muli.");
     }
