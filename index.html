@@ -246,26 +246,30 @@ function initQR(){
  if(shareableInput) shareableInput.value = link;
  
  const qrContainer = $("qrcode");
- if(qrContainer && window.QRCode){
+ if(qrContainer){
    qrContainer.innerHTML = "";
-   try {
-     new QRCode(qrContainer, {
-       text: link,
-       width: 120,
-       height: 120,
-       colorDark: "#000000",
-       colorLight: "#ffffff",
-       correctLevel: QRCode.CorrectLevel.H
-     });
-   } catch(err) {
-     console.error("QR Generation failed:", err);
+   if(window.QRCode){
+     try {
+       new QRCode(qrContainer, {
+         text: link,
+         width: 120,
+         height: 120,
+         colorDark: "#000000",
+         colorLight: "#ffffff",
+         correctLevel: QRCode.CorrectLevel.H
+       });
+     } catch(err) {
+       console.error("QR Generation failed:", err);
+     }
    }
  }
 }
 
-window.addEventListener("load", () => {
+if(document.readyState === "complete" || document.readyState === "interactive") {
   initQR();
-});
+} else {
+  window.addEventListener("DOMContentLoaded", initQR);
+}
 
 $("leaveForm").addEventListener("submit",async e=>{
  e.preventDefault();const btn=$("submitBtn");if(busy)return;
