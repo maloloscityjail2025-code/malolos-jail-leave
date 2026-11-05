@@ -479,7 +479,7 @@ function renderTable() {
                 <td>${escapeHTML(r.type)}</td>
                 <td>${formatDate(r.start)}</td>
                 <td>${formatDate(r.end)}</td>
-                <td>${isAdmin ? escapeHTML(r.reason || '-') : '<span style="color:#94a3b8; font-style:italic;">Hidden (Admin Only)</span>'}</td>
+                <td>${isAdmin ? escapeHTML(r.reason || r.Reason || '-') : '<span style="color:#94a3b8; font-style:italic;">Hidden (Admin Only)</span>'}</td>
                 <td>${calculateDays(r.start, r.end)} day(s)</td>
                 <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
                 <td>
