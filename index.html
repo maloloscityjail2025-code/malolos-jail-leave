@@ -122,7 +122,7 @@ footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
 <!-- QR Code Section -->
 <section class="panel" id="qrSection">
     <h2>Online & QR Code Leave Filing</h2>
-    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form[cite: 3].</p>
+    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form.</p>
     
     <div class="qr-section">
         <div id="qrcode"></div>
@@ -250,7 +250,7 @@ const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3qNLH4KncAL
 
 let requests = [];
 let isAdmin = localStorage.getItem("malolos_admin") === "true";
-let isBusyUpdating = false; // Pigilan ang auto-refresh habang nagpapadala ng action
+let isBusyUpdating = false;
 
 let totalPersonnelCount = localStorage.getItem("malolos_total_personnel") || 38;
 const totalPersonnelEl = document.getElementById("totalPersonnel");
@@ -362,7 +362,7 @@ async function fetchDataFromSheet(forceRefresh = false) {
     }
 }
 
-const baseSiteUrl = window.location.href.split('?')[0].split('#')[0];
+const baseSiteUrl = window.location.href ? window.location.href.split('?')[0].split('#')[0] : "";
 const qrTargetUrl = baseSiteUrl + "?mode=form";
 const shareableLinkInput = document.getElementById("shareableLink");
 if(shareableLinkInput) shareableLinkInput.value = qrTargetUrl;
@@ -391,11 +391,11 @@ function copyLink() {
 
 function escapeHTML(value) {
     return String(value || "").replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
+        "&": "&",
+        "<": "<",
+        ">": ">",
+        '"': """,
+        "'": "'"
     })[char]);
 }
 
@@ -479,7 +479,7 @@ function renderTable() {
                 <td>${escapeHTML(r.type)}</td>
                 <td>${formatDate(r.start)}</td>
                 <td>${formatDate(r.end)}</td>
-                <td>${escapeHTML(r.reason || '-')}</td>
+                <td>${isAdmin ? escapeHTML(r.reason || '-') : '<span style="color:#94a3b8; font-style:italic;">Hidden (Admin Only)</span>'}</td>
                 <td>${calculateDays(r.start, r.end)} day(s)</td>
                 <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
                 <td>
@@ -522,11 +522,10 @@ async function changeStatus(id, status) {
         return;
     }
     
-    // Tiyaking String comparison ang gamit sa id
     const request = requests.find(r => String(r.id) === String(id));
     if (!request) return;
     
-    isBusyUpdating = true; // Temporary lock sa auto-refresh
+    isBusyUpdating = true;
     request.status = status;
     renderTable();
 
@@ -544,7 +543,7 @@ async function deleteRequest(id) {
     }
     if (!confirm("Are you sure you want to delete this leave request?")) return;
     
-    isBusyUpdating = true; // Temporary lock sa auto-refresh
+    isBusyUpdating = true;
     requests = requests.filter(r => String(r.id) !== String(id));
     renderTable();
 
@@ -557,6 +556,7 @@ async function deleteRequest(id) {
 
 document.getElementById("leaveForm").addEventListener("submit", async function(event) {
     event.preventDefault();
+    const form = event.target;
 
     const submitBtn = document.getElementById("submitBtn");
     submitBtn.disabled = true;
@@ -594,7 +594,7 @@ document.getElementById("leaveForm").addEventListener("submit", async function(e
 
     if (success) {
         alert("Leave request submitted successfully!");
-        this.reset();
+        form.reset();
     } else {
         alert("May naganap na error sa pag-save. Pakisubukan muli.");
     }
