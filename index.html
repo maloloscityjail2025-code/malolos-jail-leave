@@ -2,234 +2,616 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#102a56">
-<title>Malolos City Jail | Personnel Leave Management</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MALOLOS CITY JAIL Personnel Leave Dashboard</title>
+<!-- QR Code Library via CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{--navy:#102a56;--blue:#1d4ed8;--light:#eff6ff;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--bg:#f3f6fb;--green:#15803d;--red:#b91c1c;--amber:#b45309}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Tahoma,Arial,sans-serif}
-header{background:linear-gradient(115deg,#102a56,#1e40af);color:#fff;padding:20px clamp(16px,3vw,36px);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:15px}.logos{display:flex;gap:8px}.logos img,.right-logo img{width:68px;height:68px;object-fit:contain}.brand h1{font-size:clamp(18px,2vw,25px);margin:0 0 4px}.brand p{margin:0;color:#dbeafe}
-nav{background:#173b7a;padding:10px clamp(16px,3vw,36px);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.navlinks{display:flex;gap:6px;flex-wrap:wrap}nav a{color:#eaf2ff;text-decoration:none;padding:9px 11px;border-radius:7px;font-weight:700;font-size:13px}nav a:hover,nav a.active{background:#ffffff20}
-.navright{display:flex;align-items:center;gap:10px;color:#dbeafe;font-size:12px}
-main{max-width:1480px;margin:auto;padding:24px clamp(12px,2vw,28px)}
-h2{font-size:20px;margin:0 0 16px;color:#142b52}h3{margin:0 0 10px;font-size:14px}
-.muted{color:var(--muted)}.small{font-size:12px}.hidden{display:none!important}
-.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
-.card,.panel{background:#fff;border:1px solid #e8edf5;border-radius:12px;box-shadow:0 3px 12px #0f172a08}
-.card{padding:18px}.card .label{font-size:11px;letter-spacing:.6px;font-weight:700;color:var(--muted)}.number{font-size:30px;font-weight:800;color:var(--blue);margin-top:5px}
-.panel{padding:20px;margin-bottom:20px;overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-button,.button{border:0;border-radius:7px;background:var(--blue);color:#fff;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-button:hover,.button:hover{filter:brightness(.94)}button:disabled{opacity:.55;cursor:not-allowed}.secondary{background:#475569}.success{background:var(--green)}.danger{background:var(--red)}.warning{background:var(--amber)}.soft{background:#eaf1ff;color:#173b7a}
-input,select,textarea{width:100%;padding:10px 11px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;color:var(--ink);font:inherit;min-width:0}
-input:focus,select:focus,textarea:focus{outline:2px solid #93c5fd;border-color:#3b82f6}
-label{display:block;font-size:12px;font-weight:700;color:#475569;margin:0 0 5px}.field{min-width:0}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.formgrid .wide{grid-column:1/-1}
-.toolbar{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:9px;align-items:end;margin-bottom:12px}
-.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;min-width:930px}th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:12px;vertical-align:top}th{background:#eff6ff;color:#173b7a;position:sticky;top:0;z-index:1}tr:last-child td{border-bottom:0}.status{font-size:10px;font-weight:800;text-transform:uppercase;padding:4px 7px;border-radius:20px;display:inline-block}.Pending{background:#fef3c7;color:#92400e}.Approved{background:#dcfce7;color:#166534}.Rejected{background:#fee2e2;color:#991b1b}
-.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{padding:6px 8px;font-size:11px}.qrbox{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#f8fafc;border:1px dashed #cbd5e1;padding:15px;border-radius:9px}#qrcode{background:#fff;padding:8px;border-radius:6px;min-width:136px;min-height:136px}
-.summarygrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.summaryitem{padding:12px;background:#f8fafc;border-radius:8px}.summaryitem strong{display:block;font-size:22px;color:#1d4ed8}
-.notice{padding:11px 13px;border-radius:8px;background:#eff6ff;color:#1e40af;margin-bottom:14px}.error{background:#fef2f2;color:#991b1b}.successnote{background:#f0fdf4;color:#166534}
-.modal{position:fixed;inset:0;background:#0f172a99;display:flex;align-items:center;justify-content:center;padding:15px;z-index:10}.modalbox{background:white;padding:22px;border-radius:12px;width:min(440px,100%);box-shadow:0 12px 35px #0003}.modalbox h3{font-size:18px;color:var(--navy)}
-footer{text-align:center;color:#64748b;padding:20px;font-size:11px}
-@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.summarygrid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:560px){header{justify-content:center;text-align:center}.brand{flex-direction:column}.logos{justify-content:center}.right-logo{display:none}nav{justify-content:center}.navlinks{justify-content:center}.cards{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}.toolbar{grid-template-columns:1fr}.summarygrid{grid-template-columns:1fr 1fr}main{padding:14px 10px}.panel{padding:14px}}
-@media print{nav,.no-print,button,footer{display:none!important}body{background:#fff}.panel,.card{box-shadow:none;border:1px solid #ddd}main{max-width:none;padding:0}}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Tahoma, sans-serif; background: #f1f5f9; color: #1e293b; }
+header { background: #172554; color: white; padding: 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.header-left { display: flex; align-items: center; gap: 15px; }
+.logo-container { display: flex; align-items: center; gap: 10px; }
+.logo-container img, .logo-right img { height: 100px; width: 100px; object-fit: contain; background: none; border-radius: 0%; padding: 0px; box-shadow: 0 0px 0px rgba(0,0,0,0.2); }
+header h1 { margin: 0 0 6px; font-size: 24px; }
+nav { background: #1e3a8a; padding: 12px 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.nav-links { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+nav a { color: white; text-decoration: none; margin-right: 15px; font-size: 14px; font-weight: bold; }
+nav a:hover { text-decoration: underline; }
+main { padding: 24px; max-width: 1400px; margin: auto; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.card { background: white; padding: 22px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.card h3 { margin-top: 0; font-size: 13px; color: #64748b; letter-spacing: 0.5px; }
+.number { font-size: 32px; font-weight: bold; color: #2563eb; }
+.panel { background: white; padding: 20px; border-radius: 10px; margin-bottom: 24px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+button { border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; color: white; background: #2563eb; margin: 3px; font-weight: bold; }
+button:hover { opacity: 0.85; }
+.approve { background: #15803d; }
+.reject { background: #dc2626; }
+.delete { background: #64748b; }
+input, select, textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 5px 4px 5px 0; font-size: 14px; width: 100%; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 850px; }
+th, td { padding: 13px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
+th { background: #eff6ff; color: #1e3a8a; }
+.status { font-weight: bold; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+.Pending { color: #b45309; }
+.Approved { color: #15803d; }
+.Rejected { color: #dc2626; }
+#leaveForm { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+#leaveForm textarea { grid-column: span 2; }
+#leaveForm button { width: fit-content; grid-column: span 2; justify-self: start; }
+.qr-section { display: flex; align-items: center; gap: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-top: 15px; flex-wrap: wrap; }
+#qrcode { background: white; padding: 10px; border-radius: 6px; display: inline-block; }
+.admin-badge { background: #15803d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
+@media (max-width: 800px) {
+    header { flex-direction: column; text-align: center; justify-content: center; }
+    .header-left { flex-direction: column; text-align: center; }
+    .logo-container { justify-content: center; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    #leaveForm { grid-template-columns: 1fr; }
+    #leaveForm textarea { grid-column: span 1; }
+    #leaveForm button { grid-column: span 1; width: 100%; }
+    main { padding: 12px; }
+    nav a { display: inline-block; margin: 5px; }
+}
+@media (max-width: 420px) {
+    .cards { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
-<header id="siteHeader">
-  <div class="brand">
-    <div class="logos"><img src="logo12.png" alt="BJMP logo" onerror="this.style.display='none'"><img src="logo2.png" alt="Office logo" onerror="this.style.display='none'"></div>
-    <div><h1>MALOLOS CITY JAIL</h1><p>Personnel Leave Management System</p></div>
-  </div>
-  <div class="right-logo"><img src="logo3.png" alt="Malolos City Jail logo" onerror="this.style.display='none'"></div>
+
+<header id="mainHeader">
+    <div class="header-left">
+        <div class="logo-container">
+            <img src="logo12.png" alt="Logo 1">
+            <img src="logo2.png" alt="Logo 2">
+        </div>
+        <div>
+            <h1>MALOLOS CITY JAIL - Personnel Leave Dashboard</h1>
+            <div>Human Resources and Personnel Management System</div>
+        </div>
+    </div>
+    <div class="logo-right">
+        <img src="logo3.png" alt="Logo 3">
+    </div>
 </header>
-<nav id="siteNav">
-  <div class="navlinks">
-    <a href="#dashboard">Dashboard</a><a href="#qrPanel">QR / Online Filing</a><a href="#requestsPanel">Leave Requests</a><a href="#summaryPanel">Leave Summary</a><a href="#personnelPanel" class="admin-only hidden">Personnel</a>
-  </div>
-  <div class="navright"><span id="modeLabel">VIEWER MODE</span><button id="loginBtn" class="secondary" type="button">Admin Login</button></div>
+
+<nav id="mainNav">
+    <div class="nav-links">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#leaveFormSection" id="navFileLeaveLink">File Leave</a>
+        <a href="#qrSection">QR Code & Online Filing</a>
+        <a href="#requests">Leave Requests</a>
+        <a href="#summary">Leave Summary</a>
+    </div>
+    <div>
+        <span id="adminStatusDisplay" style="color: #cbd5e1; font-size: 13px; margin-right: 10px;">Viewer Mode</span>
+        <button id="adminAuthBtn" type="button" onclick="toggleAdminModal()" style="background: #0284c7; padding: 6px 12px; font-size: 13px;">Admin Login</button>
+    </div>
 </nav>
-<main>
-  <section id="formModeNotice" class="notice hidden">Online leave application form — complete all required fields and submit your request.</section>
-  <section id="dashboard">
-    <div class="panel-head"><h2>Dashboard Overview</h2><span class="muted small" id="lastUpdated">Waiting for data…</span></div>
+
+<main id="mainContainer">
+
+<section id="dashboard">
+    <h2>Dashboard Overview</h2>
     <div class="cards">
-      <div class="card"><div class="label">TOTAL PERSONNEL</div><div class="number" id="totalPersonnel">0</div></div>
-      <div class="card"><div class="label">PENDING REQUESTS</div><div class="number" id="pendingCount">0</div></div>
-      <div class="card"><div class="label">APPROVED REQUESTS</div><div class="number" id="approvedCount">0</div></div>
-      <div class="card"><div class="label">PERSONNEL ON LEAVE TODAY</div><div class="number" id="onLeaveCount">0</div></div>
+        <div class="card" style="position: relative;">
+            <h3>TOTAL PERSONNEL</h3>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="number" id="totalPersonnel" style="cursor: pointer;" title="I-click para palitan ang bilang" onclick="editTotalPersonnel()">38</div>
+                <button id="editPersonnelBtn" type="button" onclick="editTotalPersonnel()" style="display: none; padding: 4px 8px; font-size: 11px; background: #0284c7; margin: 0;">Palitan</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3>PENDING REQUESTS</h3>
+            <div class="number" id="pendingCount">0</div>
+        </div>
+        <div class="card">
+            <h3>APPROVED REQUESTS</h3>
+            <div class="number" id="approvedCount">0</div>
+        </div>
+        <div class="card">
+            <h3>PERSONNEL ON LEAVE TODAY</h3>
+            <div class="number" id="onLeaveCount">0</div>
+        </div>
     </div>
-  </section>
+</section>
 
-  <section class="panel" id="qrPanel">
-    <div class="panel-head"><h2>QR Code & Online Leave Filing</h2><button type="button" class="soft no-print" id="copyLinkBtn">Copy Filing Link</button></div>
-    <p class="muted">Scan the QR code using a smartphone camera to open the online leave application form. Share the link only through authorized channels.</p>
-    <div class="qrbox"><div id="qrcode"></div><div style="min-width:min(100%,320px);flex:1"><label>Direct Online Filing Link</label><input id="shareableLink" readonly><p class="small muted">The page must be hosted on a publicly accessible HTTPS website for personnel to use this link.</p></div></div>
-  </section>
+<!-- QR Code Section -->
+<section class="panel" id="qrSection">
+    <h2>Online & QR Code Leave Filing</h2>
+    <p>Maaaring i-scan ng mga tauhan ang QR code na ito gamit ang kanilang smartphone camera para direktang makapunta sa Online Leave Filing Form.</p>
+    
+    <div class="qr-section">
+        <div id="qrcode"></div>
+        <div>
+            <p><strong>Direct Online Filing Link:</strong></p>
+            <input type="text" id="shareableLink" readonly style="width: 300px; background: #e2e8f0;" value="">
+            <br>
+            <button type="button" onclick="copyLink()" style="margin-top: 8px; background: #0284c7;">Kopyahin ang Link</button>
+        </div>
+    </div>
+</section>
 
-  <section class="panel hidden" id="leaveFormPanel">
-    <h2 id="formHeading">File Leave Request</h2>
-    <div id="formMessage" class="notice hidden" role="status"></div>
-    <form id="leaveForm" class="formgrid">
-      <div class="field"><label for="employeeName">Employee Name *</label><input id="employeeName" maxlength="120" required autocomplete="name"></div>
-      <div class="field"><label for="employeeId">Employee ID *</label><input id="employeeId" maxlength="40" required></div>
-      <div class="field"><label for="department">Department / Unit *</label><select id="department" required><option value="">Select department</option><option>Security and Control</option><option>Administration</option><option>Finance</option><option>Deputy Office</option><option>Warden's Office</option><option>IT Unit</option><option>Health Service</option><option>Welfare and Development</option><option>Other</option></select></div>
-      <div class="field"><label for="leaveType">Leave Type *</label><select id="leaveType" required><option value="">Select leave type</option><option>Vacation</option><option>Sick</option><option>Emergency</option><option>Personal</option><option>Other</option></select></div>
-      <div class="field"><label for="startDate">Date From *</label><input type="date" id="startDate" required></div>
-      <div class="field"><label for="endDate">Date To *</label><input type="date" id="endDate" required></div>
-      <div class="field wide"><label for="reason">Reason / Remarks *</label><textarea id="reason" rows="3" maxlength="1000" required></textarea></div>
-      <div class="wide"><button type="submit" id="submitBtn">Submit Leave Request</button></div>
+<!-- Leave Form Section -->
+<section class="panel" id="leaveFormSection" style="display: none;">
+    <h2 id="formTitleHeader">File Leave Request (Para sa Tauhan)</h2>
+    <form id="leaveForm">
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Employee Name</label>
+            <input id="employeeName" placeholder="Ilagay ang pangalan" required>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Employee ID</label>
+            <input id="employeeId" placeholder="e.g., MLL-001" required>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Select Department</label>
+            <select id="department" required>
+                <option value="">Select department</option>
+                <option>Security and Control</option>
+                <option>Administration</option>
+                <option>Finance</option>
+                <option>Deputy office</option>
+                <option>Warden Office</option>
+                <option>IT Unit</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Select Leave Type</label>
+            <select id="leaveType" required>
+                <option value="">Select leave type</option>
+                <option>Vacation</option>
+                <option>Sick</option>
+                <option>Emergency</option>
+                <option>Personal</option>
+                <option>Other</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date From</label>
+            <input type="date" id="startDate" required>
+        </div>
+        <div>
+            <label style="font-size: 12px; font-weight: bold; color: #64748b;">Date To</label>
+            <input type="date" id="endDate" required>
+        </div>
+        <textarea id="reason" rows="3" placeholder="Ilagay ang dahilan o reason ng pag-leave..." required style="grid-column: span 2;"></textarea>
+        <button type="submit" id="submitBtn">Submit Leave Request</button>
     </form>
-  </section>
+</section>
 
-  <section class="panel" id="requestsPanel">
-    <div class="panel-head"><h2>Leave Requests</h2><div class="no-print"><button id="refreshBtn" class="soft" type="button">↻ Refresh</button> <button id="printBtn" class="secondary" type="button">Print Report</button></div></div>
-    <div class="toolbar no-print">
-      <div><label for="searchInput">Search personnel / ID</label><input id="searchInput" placeholder="Search name or employee ID"></div>
-      <div><label for="statusFilter">Status</label><select id="statusFilter"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select></div>
-      <div><label for="typeFilter">Leave type</label><select id="typeFilter"><option value="">All leave types</option><option>Vacation</option><option>Sick</option><option>Emergency</option><option>Personal</option><option>Other</option></select></div>
-      <div><label>&nbsp;</label><button id="clearFilters" class="secondary" type="button">Clear Filters</button></div>
+<section class="panel" id="requests">
+    <h2>Leave Requests</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <input id="search" placeholder="Search employee or ID..." oninput="renderTable()">
+        <select id="filterStatus" onchange="renderTable()">
+            <option value="">All statuses</option>
+            <option>Pending</option>
+            <option>Approved</option>
+            <option>Rejected</option>
+        </select>
+        <select id="filterType" onchange="renderTable()">
+            <option value="">All leave types</option>
+            <option>Vacation</option>
+            <option>Sick</option>
+            <option>Emergency</option>
+            <option>Personal</option>
+            <option>Other</option>
+        </select>
+        <button type="button" onclick="fetchDataFromSheet(true)" style="background: #0284c7;">↻ Refresh Data</button>
     </div>
-    <div id="connectionMessage" class="notice">Connect the Google Apps Script endpoint in the configuration before using live records.</div>
-    <div class="tablewrap"><table><thead><tr><th>Personnel</th><th>Department</th><th>Leave Type</th><th>Inclusive Dates</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leaveTable"><tr><td colspan="8" class="muted">No records loaded.</td></tr></tbody></table></div>
-  </section>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Leave Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Reason</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Actions <span id="actionHeaderBadge" style="font-size: 10px; color: #dc2626;">(Admin Only)</span></th>
+            </tr>
+        </thead>
+        <tbody id="leaveTable"></tbody>
+    </table>
+</section>
 
-  <section class="panel" id="summaryPanel">
-    <h2>Leave Type Summary</h2><div class="summarygrid" id="leaveSummary"></div>
-  </section>
+<section class="panel" id="summary">
+    <h2>Leave Type Summary</h2>
+    <div id="leaveSummary"></div>
+</section>
 
-  <section class="panel admin-only hidden" id="personnelPanel">
-    <div class="panel-head"><h2>Personnel Records</h2><button type="button" id="addPersonnelBtn">Add Personnel</button></div>
-    <p class="muted small">Personnel records support headcount monitoring and leave-credit tracking. Configure credits according to applicable BJMP/CSC rules and approved records.</p>
-    <div class="tablewrap"><table><thead><tr><th>Name</th><th>Employee ID</th><th>Department</th><th>Vacation Credits</th><th>Sick Credits</th><th>Action</th></tr></thead><tbody id="personnelTable"><tr><td colspan="6">No personnel records loaded.</td></tr></tbody></table></div>
-  </section>
 </main>
-<footer>Personnel Leave Management System | Malolos City Jail</footer>
 
-<div class="modal hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
- <div class="modalbox"><h3 id="loginTitle">Administrator Login</h3><p class="muted small">Sign in using the administrator password configured in Google Apps Script.</p>
- <label for="adminPassword">Admin Password</label><input type="password" id="adminPassword" autocomplete="current-password">
- <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:15px"><button type="button" class="secondary" id="cancelLogin">Cancel</button><button type="button" id="confirmLogin">Login</button></div><p id="loginError" class="small" style="color:#b91c1c"></p></div>
+<footer id="mainFooter">
+    Personnel Leave Management System | Malolos City Jail
+</footer>
+
+<!-- Admin Login Modal -->
+<div id="adminModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:30px; border-radius:10px; width:320px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <h3 style="margin-top:0; color:#1e3a8a;">Admin Login</h3>
+        <p style="font-size: 13px; color: #64748b;">Ilagay ang admin password para mag-approve o mag-delete ng leave requests.</p>
+        <input type="password" id="adminPasswordInput" placeholder="Enter password" style="width:100%; margin-bottom:12px;">
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" onclick="toggleAdminModal()" style="background:#64748b;">Cancel</button>
+            <button type="button" onclick="verifyAdmin()" style="background:#15803d;">Login</button>
+        </div>
+    </div>
 </div>
-<div class="modal hidden" id="personnelModal" role="dialog" aria-modal="true" aria-labelledby="personnelTitle">
- <div class="modalbox"><h3 id="personnelTitle">Personnel Record</h3><form id="personnelForm" class="formgrid">
- <div class="field wide"><label>Name *</label><input id="pName" required></div><div class="field"><label>Employee ID *</label><input id="pId" required></div>
- <div class="field"><label>Department *</label><input id="pDepartment" required></div><div class="field"><label>Vacation Leave Credits</label><input id="pVacation" type="number" min="0" step=".5" value="0"></div>
- <div class="field"><label>Sick Leave Credits</label><input id="pSick" type="number" min="0" step=".5" value="0"></div>
- <div class="wide" style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="secondary" id="cancelPersonnel">Cancel</button><button type="submit">Save Record</button></div></form></div>
-</div>
+
 <script>
-/* CONFIGURATION: paste your deployed Google Apps Script Web App URL below. */
-const API_URL = "PASTE_YOUR_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
-const POLL_INTERVAL_MS = 60000;
-const $ = id => document.getElementById(id);
-const params = new URLSearchParams(location.search);
-const formMode = params.get("mode") === "form";
-let requests = [], personnel = [], totalPersonnel = 0, adminToken = sessionStorage.getItem("mcj_admin_token") || "";
-let editingPersonnelId = null, busy = false;
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4KmhRo5_zAuouvA9iXf_bCHfTbc9Vjuy9tAmsBVzrIQTlnJssbKeVtFTkD-PhRUQWBQ/exec";
 
-function safe(v){return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function dateLabel(v){if(!v)return "—";const d=new Date(v+"T00:00:00");return isNaN(d)?safe(v):d.toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"});}
-function daysBetween(a,b){if(!a||!b)return 0;const x=new Date(a+"T00:00:00"),y=new Date(b+"T00:00:00");return Math.max(0,Math.round((y-x)/86400000)+1);}
-function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
-function setNotice(el,msg,type=""){el.textContent=msg;el.className="notice"+(type?" "+type:"");el.classList.remove("hidden");}
-function apiConfigured(){return API_URL.startsWith("https://script.google.com/") && !API_URL.includes("PASTE_YOUR");}
-async function api(action,data={},admin=false){
- if(!apiConfigured()) throw new Error("Google Apps Script URL is not configured.");
- const payload={action,...data}; if(admin)payload.token=adminToken;
- const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
- if(!response.ok)throw new Error("Server returned HTTP "+response.status);
- const result=await response.json(); if(!result.ok)throw new Error(result.error||"Request failed.");
- return result;
+let requests = [];
+let isAdmin = localStorage.getItem("malolos_admin") === "true";
+let isBusyUpdating = false;
+
+let totalPersonnelCount = localStorage.getItem("malolos_total_personnel") || 38;
+const totalPersonnelEl = document.getElementById("totalPersonnel");
+if(totalPersonnelEl) totalPersonnelEl.textContent = totalPersonnelCount;
+
+function editTotalPersonnel() {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mabago ang bilang ng Total Personnel.");
+        return;
+    }
+    
+    const newCount = prompt("Ilagay ang bagong bilang ng Total Personnel:", totalPersonnelCount);
+    if (newCount !== null && newCount.trim() !== "") {
+        const parsed = parseInt(newCount, 10);
+        if (!isNaN(parsed) && parsed >= 0) {
+            totalPersonnelCount = parsed;
+            localStorage.setItem("malolos_total_personnel", totalPersonnelCount);
+            document.getElementById("totalPersonnel").textContent = totalPersonnelCount;
+            alert("Matagumpay na na-update ang Total Personnel!");
+        } else {
+            alert("Mangyaring maglagay ng wastong numero.");
+        }
+    }
 }
-function setAdminUI(){
- $("modeLabel").textContent=adminToken?"ADMIN MODE":"VIEWER MODE";
- $("loginBtn").textContent=adminToken?"Admin Logout":"Admin Login";
- $("loginBtn").className=adminToken?"danger":"secondary";
- document.querySelectorAll(".admin-only").forEach(el=>el.classList.toggle("hidden",!adminToken));
- renderTable(); renderPersonnel();
+
+const urlParams = new URLSearchParams(window.location.search);
+const isFormMode = urlParams.get('mode') === 'form';
+
+if (isFormMode) {
+    document.getElementById("mainHeader").style.display = "none";
+    document.getElementById("mainNav").style.display = "none";
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("qrSection").style.display = "none";
+    document.getElementById("requests").style.display = "none";
+    document.getElementById("summary").style.display = "none";
+    document.getElementById("mainFooter").style.display = "none";
+    document.getElementById("leaveFormSection").style.display = "block";
+    document.getElementById("formTitleHeader").textContent = "Malolos City Jail - Online Leave Filing Form";
+} else {
+    document.getElementById("leaveFormSection").style.display = "none";
+    const navFileLeave = document.getElementById("navFileLeaveLink");
+    if(navFileLeave) navFileLeave.style.display = "none";
 }
-function showLogin(){if(adminToken){if(confirm("Log out of administrator mode?")){adminToken="";sessionStorage.removeItem("mcj_admin_token");setAdminUI();loadData();}}else{$("loginModal").classList.remove("hidden");$("adminPassword").value="";$("loginError").textContent="";$("adminPassword").focus();}}
-async function login(){
- const password=$("adminPassword").value;
- try{const r=await api("login",{password});adminToken=r.token;sessionStorage.setItem("mcj_admin_token",adminToken);$("loginModal").classList.add("hidden");setAdminUI();await loadData();}
- catch(e){$("loginError").textContent=e.message;}
+
+function updateAdminUI() {
+    const statusDisplay = document.getElementById("adminStatusDisplay");
+    const authBtn = document.getElementById("adminAuthBtn");
+    const actionBadge = document.getElementById("actionHeaderBadge");
+    const editPersonnelBtn = document.getElementById("editPersonnelBtn");
+
+    if (statusDisplay && authBtn) {
+        if (isAdmin) {
+            statusDisplay.innerHTML = '<span class="admin-badge">ADMIN MODE</span>';
+            authBtn.textContent = "Logout Admin";
+            authBtn.style.background = "#dc2626";
+            if(actionBadge) actionBadge.style.display = "none";
+            if(editPersonnelBtn) editPersonnelBtn.style.display = "inline-block";
+        } else {
+            statusDisplay.textContent = "Viewer Mode";
+            authBtn.textContent = "Admin Login";
+            authBtn.style.background = "#0284c7";
+            if(actionBadge) actionBadge.style.display = "inline";
+            if(editPersonnelBtn) editPersonnelBtn.style.display = "none";
+        }
+    }
+    if (!isFormMode) {
+        renderTable();
+    }
 }
-async function loadData(){
- if(formMode)return;
- try{
-  const r=await api("list",{},!!adminToken);
-  requests=Array.isArray(r.requests)?r.requests:[];
-  personnel=Array.isArray(r.personnel)?r.personnel:[]; totalPersonnel=Number(r.totalPersonnel||personnel.length||0);
-  $("connectionMessage").classList.add("hidden");
-  $("lastUpdated").textContent="Last updated: "+new Date().toLocaleTimeString("en-PH");
-  renderTable();renderDashboard();renderPersonnel();
- }catch(e){
-  if(adminToken && /auth|token|session/i.test(e.message)){adminToken="";sessionStorage.removeItem("mcj_admin_token");setAdminUI();}
-  setNotice($("connectionMessage"),e.message,"error");
- }
+
+function toggleAdminModal() {
+    if (isAdmin) {
+        if (confirm("Gusto mo bang mag-logout bilang Admin?")) {
+            isAdmin = false;
+            localStorage.removeItem("malolos_admin");
+            updateAdminUI();
+        }
+    } else {
+        const modal = document.getElementById("adminModal");
+        modal.style.display = "flex";
+        document.getElementById("adminPasswordInput").value = "";
+        document.getElementById("adminPasswordInput").focus();
+    }
 }
-function renderDashboard(){
- $("totalPersonnel").textContent=totalPersonnel || "0";
- $("pendingCount").textContent=requests.filter(x=>x.status==="Pending").length;
- $("approvedCount").textContent=requests.filter(x=>x.status==="Approved").length;
- $("onLeaveCount").textContent=requests.filter(x=>x.status==="Approved"&&x.start<=today()&&x.end>=today()).length;
- const types=["Vacation","Sick","Emergency","Personal","Other"];
- $("leaveSummary").innerHTML=types.map(t=>`<div class="summaryitem"><span>${safe(t)} Leave</span><strong>${requests.filter(x=>x.type===t).length}</strong><span class="muted small">request(s)</span></div>`).join("");
+
+function verifyAdmin() {
+    const pass = document.getElementById("adminPasswordInput").value.trim();
+    if (pass === "malolos2026") {
+        isAdmin = true;
+        localStorage.setItem("malolos_admin", "true");
+        document.getElementById("adminModal").style.display = "none";
+        alert("Matagumpay kang naka-login bilang Admin!");
+        updateAdminUI();
+    } else {
+        alert("Maling password! Subukan muli.");
+    }
 }
-function renderTable(){
- const term=$("searchInput").value.toLowerCase().trim(),status=$("statusFilter").value,type=$("typeFilter").value;
- const rows=requests.filter(r=>(!term||String(r.name||"").toLowerCase().includes(term)||String(r.employeeId||"").toLowerCase().includes(term))&&(!status||r.status===status)&&(!type||r.type===type));
- $("leaveTable").innerHTML=rows.length?rows.map(r=>`<tr>
- <td><strong>${safe(r.name)}</strong><br><span class="muted">${safe(r.employeeId)}</span></td><td>${safe(r.department)}</td><td>${safe(r.type)}</td>
- <td>${dateLabel(r.start)}<br>to ${dateLabel(r.end)}</td><td>${daysBetween(r.start,r.end)}</td>
- <td>${adminToken?safe(r.reason||"—"):'<span class="muted">Admin only</span>'}</td><td><span class="status ${safe(r.status)}">${safe(r.status)}</span></td>
- <td>${adminToken?`<div class="actions">${r.status==="Pending"?`<button class="success" data-action="approve" data-id="${safe(r.id)}">Approve</button><button class="danger" data-action="reject" data-id="${safe(r.id)}">Reject</button>`:`<button class="secondary" data-action="delete" data-id="${safe(r.id)}">Delete</button>`}</div>`:'<span class="muted">Restricted</span>'}</td></tr>`).join(""):`<tr><td colspan="8" class="muted">No leave requests found.</td></tr>`;
+
+async function fetchDataFromSheet(forceRefresh = false) {
+    if (isFormMode || (isBusyUpdating && !forceRefresh)) return; 
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+            requests = data;
+            renderTable();
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
 }
-async function changeRequest(id,action){
- if(!adminToken)return alert("Administrator login required.");
- if(action==="delete"&&!confirm("Permanently delete this leave request?"))return;
- try{await api(action,{id},true);await loadData();}catch(e){alert(e.message);}
+
+const baseSiteUrl = window.location.href ? window.location.href.split('?')[0].split('#')[0] : "";
+const qrTargetUrl = baseSiteUrl + "?mode=form";
+const shareableLinkInput = document.getElementById("shareableLink");
+if(shareableLinkInput) shareableLinkInput.value = qrTargetUrl;
+
+try {
+    const qrcodeContainer = document.getElementById("qrcode");
+    if(qrcodeContainer) {
+        qrcodeContainer.innerHTML = "";
+        new QRCode(qrcodeContainer, {
+            text: qrTargetUrl,
+            width: 120,
+            height: 120
+        });
+    }
+} catch(e) {
+    console.log("QR Code error:", e);
 }
-function renderPersonnel(){
- if(!$("personnelTable"))return;
- $("personnelTable").innerHTML=personnel.length?personnel.map(p=>`<tr><td>${safe(p.name)}</td><td>${safe(p.employeeId)}</td><td>${safe(p.department)}</td><td>${Number(p.vacationCredits||0)}</td><td>${Number(p.sickCredits||0)}</td><td><button class="soft" data-edit-person="${safe(p.employeeId)}">Edit</button> <button class="danger" data-delete-person="${safe(p.employeeId)}">Delete</button></td></tr>`).join(""):`<tr><td colspan="6" class="muted">No personnel records yet.</td></tr>`;
+
+function copyLink() {
+    const linkInput = document.getElementById("shareableLink");
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(linkInput.value);
+    alert("Na-copy na ang link para sa QR Code! Maaari mo itong i-send sa mga tauhan.");
 }
-function openPersonnel(p=null){
- editingPersonnelId=p?p.employeeId:null;$("personnelTitle").textContent=p?"Edit Personnel":"Add Personnel";
- $("pName").value=p?.name||"";$("pId").value=p?.employeeId||"";$("pId").disabled=!!p;$("pDepartment").value=p?.department||"";
- $("pVacation").value=p?.vacationCredits??0;$("pSick").value=p?.sickCredits??0;$("personnelModal").classList.remove("hidden");
+
+function escapeHTML(value) {
+    return String(value || "").replace(/[&<>"']/g, char => ({
+        "&": "&",
+        "<": "<",
+        ">": ">",
+        '"': """,
+        "'": "'"
+    })[char]);
 }
-async function submitPersonnel(e){
- e.preventDefault();try{await api("savePersonnel",{personnel:{name:$("pName").value.trim(),employeeId:$("pId").value.trim(),department:$("pDepartment").value.trim(),vacationCredits:Number($("pVacation").value),sickCredits:Number($("pSick").value)}},true);$("personnelModal").classList.add("hidden");await loadData();}catch(err){alert(err.message);}
+
+function formatDate(value) {
+    if (!value) return "";
+    return new Date(value).toLocaleDateString(
+        "en-PH",
+        {year: "numeric", month: "short", day: "numeric"}
+    );
 }
-function initQR(){
- const link=location.href.split("?")[0].split("#")[0]+"?mode=form";$("shareableLink").value=link;
- if(window.QRCode)new QRCode($("qrcode"),{text:link,width:120,height:120});
+
+function calculateDays(start, end) {
+    const a = new Date(start);
+    const b = new Date(end);
+    return Math.max(1, Math.round((b - a) / 86400000) + 1);
 }
-$("leaveForm").addEventListener("submit",async e=>{
- e.preventDefault();const btn=$("submitBtn");if(busy)return;
- const start=$("startDate").value,end=$("endDate").value;if(end<start){setNotice($("formMessage"),"Date To must be on or after Date From.","error");return;}
- const payload={name:$("employeeName").value.trim(),employeeId:$("employeeId").value.trim(),department:$("department").value,type:$("leaveType").value,start,end,reason:$("reason").value.trim()};
- busy=true;btn.disabled=true;btn.textContent="Submitting…";
- try{await api("add",{request:payload});$("leaveForm").reset();setNotice($("formMessage"),"Your leave request was submitted successfully. It is pending administrator review.","success");}
- catch(err){setNotice($("formMessage"),err.message,"error");}
- finally{busy=false;btn.disabled=false;btn.textContent="Submit Leave Request";}
+
+function todayString() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function updateDashboard() {
+    if (isFormMode) return;
+    const today = todayString();
+
+    const pendingEl = document.getElementById("pendingCount");
+    const approvedEl = document.getElementById("approvedCount");
+    const onLeaveEl = document.getElementById("onLeaveCount");
+    const leaveSummaryEl = document.getElementById("leaveSummary");
+
+    if(pendingEl) pendingEl.textContent = requests.filter(r => r.status === "Pending").length;
+    if(approvedEl) approvedEl.textContent = requests.filter(r => r.status === "Approved").length;
+    if(onLeaveEl) onLeaveEl.textContent = requests.filter(r => r.status === "Approved" && r.start <= today && r.end >= today).length;
+
+    const types = ["Vacation", "Sick", "Emergency", "Personal", "Other"];
+    if(leaveSummaryEl) {
+        leaveSummaryEl.innerHTML = types.map(type => {
+            const count = requests.filter(r => r.type === type).length;
+            return `<p><strong>${escapeHTML(type)} Leave:</strong> ${count} request(s)</p>`;
+        }).join("");
+    }
+}
+
+function renderTable() {
+    if (isFormMode) return;
+    const searchInput = document.getElementById("search");
+    const filterStatusInput = document.getElementById("filterStatus");
+    const filterTypeInput = document.getElementById("filterType");
+
+    const search = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const status = filterStatusInput ? filterStatusInput.value : "";
+    const type = filterTypeInput ? filterTypeInput.value : "";
+
+    const filtered = requests.filter(r => {
+        const matchesSearch =
+            (r.name && r.name.toLowerCase().includes(search)) ||
+            (r.employeeId && r.employeeId.toLowerCase().includes(search));
+
+        return matchesSearch &&
+            (!status || r.status === status) &&
+            (!type || r.type === type);
+    });
+
+    const table = document.getElementById("leaveTable");
+    if (!table) return;
+
+    if (filtered.length === 0) {
+        table.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #64748b; padding: 20px;">No leave requests found.</td></tr>';
+    } else {
+        table.innerHTML = filtered.map(r => `
+            <tr>
+                <td>
+                    <strong>${escapeHTML(r.name)}</strong><br>
+                    <span style="color: #64748b; font-size: 11px;">${escapeHTML(r.employeeId)}</span>
+                </td>
+                <td>${escapeHTML(r.department)}</td>
+                <td>${escapeHTML(r.type)}</td>
+                <td>${formatDate(r.start)}</td>
+                <td>${formatDate(r.end)}</td>
+                <td>${isAdmin ? escapeHTML(r.reason || r.Reason || '-') : '<span style="color:#94a3b8; font-style:italic;">Hidden (Admin Only)</span>'}</td>
+                <td>${calculateDays(r.start, r.end)} day(s)</td>
+                <td><span class="status ${escapeHTML(r.status)}">${escapeHTML(r.status)}</span></td>
+                <td>
+                    ${isAdmin ? (
+                        r.status === "Pending" ? `
+                            <button type="button" class="approve" onclick="changeStatus('${r.id}', 'Approved')">Approve</button>
+                            <button type="button" class="reject" onclick="changeStatus('${r.id}', 'Rejected')">Reject</button>
+                        ` : `
+                            <button type="button" class="delete" onclick="deleteRequest('${r.id}')">Delete</button>
+                        `
+                    ) : '<span style="color:#94a3b8; font-size:12px; font-style:italic;">Restricted (Admin Only)</span>'}
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    updateDashboard();
+}
+
+async function sendToGoogleScript(payload) {
+    try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: JSON.stringify(payload)
+        });
+        return true;
+    } catch (error) {
+        console.error("Fetch error:", error);
+        return false;
+    }
+}
+
+async function changeStatus(id, status) {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mag-approve/reject.");
+        return;
+    }
+    
+    const request = requests.find(r => String(r.id) === String(id));
+    if (!request) return;
+    
+    isBusyUpdating = true;
+    request.status = status;
+    renderTable();
+
+    await sendToGoogleScript({ action: "updateStatus", id: id, status: status });
+    
+    setTimeout(() => {
+        isBusyUpdating = false;
+    }, 5000);
+}
+
+async function deleteRequest(id) {
+    if (!isAdmin) {
+        alert("Kailangan mong mag-admin login para mag-delete.");
+        return;
+    }
+    if (!confirm("Are you sure you want to delete this leave request?")) return;
+    
+    isBusyUpdating = true;
+    requests = requests.filter(r => String(r.id) !== String(id));
+    renderTable();
+
+    await sendToGoogleScript({ action: "delete", id: id });
+    
+    setTimeout(() => {
+        isBusyUpdating = false;
+    }, 5000);
+}
+
+document.getElementById("leaveForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const form = event.target;
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Saving...";
+
+    const name = document.getElementById("employeeName").value.trim();
+    const employeeId = document.getElementById("employeeId").value.trim();
+    const department = document.getElementById("department").value;
+    const type = document.getElementById("leaveType").value;
+    const start = document.getElementById("startDate").value;
+    const end = document.getElementById("endDate").value;
+    const reason = document.getElementById("reason").value.trim();
+
+    if (end < start) {
+        alert("End date must be on or after the start date.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Leave Request";
+        return;
+    }
+
+    const newRequest = {
+        action: "add",
+        id: Date.now(),
+        name,
+        employeeId,
+        department,
+        type,
+        start,
+        end,
+        reason,
+        status: "Pending"
+    };
+
+    const success = await sendToGoogleScript(newRequest);
+
+    if (success) {
+        alert("Leave request submitted successfully!");
+        form.reset();
+    } else {
+        alert("May naganap na error sa pag-save. Pakisubukan muli.");
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Leave Request";
 });
-$("leaveTable").addEventListener("click",e=>{const b=e.target.closest("button[data-action]");if(b)changeRequest(b.dataset.id,b.dataset.action);});
-$("personnelTable").addEventListener("click",e=>{const edit=e.target.closest("[data-edit-person]"),del=e.target.closest("[data-delete-person]");if(edit)openPersonnel(personnel.find(p=>p.employeeId===edit.dataset.editPerson));if(del&&confirm("Delete this personnel record?"))api("deletePersonnel",{employeeId:del.dataset.deletePerson},true).then(loadData).catch(x=>alert(x.message));});
-$("loginBtn").addEventListener("click",showLogin);$("confirmLogin").addEventListener("click",login);$("cancelLogin").addEventListener("click",()=>$("loginModal").classList.add("hidden"));
-$("adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")login();});
-$("refreshBtn").addEventListener("click",loadData);$("printBtn").addEventListener("click",()=>window.print());
-$("copyLinkBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("shareableLink").value);alert("Filing link copied.");}catch(e){$("shareableLink").select();document.execCommand("copy");alert("Filing link copied.");}});
-$("clearFilters").addEventListener("click",()=>{$("searchInput").value="";$("statusFilter").value="";$("typeFilter").value="";renderTable();});
-["searchInput","statusFilter","typeFilter"].forEach(id=>$(id).addEventListener("input",renderTable));
-$("addPersonnelBtn").addEventListener("click",()=>openPersonnel());$("cancelPersonnel").addEventListener("click",()=>$("personnelModal").classList.add("hidden"));$("personnelForm").addEventListener("submit",submitPersonnel);
-if(formMode){$("siteHeader").classList.add("hidden");$("siteNav").classList.add("hidden");$("dashboard").classList.add("hidden");$("qrPanel").classList.add("hidden");$("requestsPanel").classList.add("hidden");$("summaryPanel").classList.add("hidden");$("personnelPanel").classList.add("hidden");$("leaveFormPanel").classList.remove("hidden");$("formModeNotice").classList.remove("hidden");$("formHeading").textContent="Malolos City Jail — Online Leave Application";}
-else{$("leaveFormPanel").classList.add("hidden");initQR();setAdminUI();loadData();setInterval(loadData,POLL_INTERVAL_MS);}
+
+// Initial setup
+if (!isFormMode) {
+    fetchDataFromSheet();
+    updateAdminUI();
+    setInterval(() => fetchDataFromSheet(), 30000);
+} else {
+    updateAdminUI();
+}
 </script>
 </body>
 </html>
