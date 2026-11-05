@@ -330,12 +330,15 @@ function toggleAdminModal() {
         }
     } else {
         const modal = document.getElementById("adminModal");
-        modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
+        // Siguraduhing gagawin itong 'flex'
+        modal.style.display = "flex";
         document.getElementById("adminPasswordInput").value = "";
+        document.getElementById("adminPasswordInput").focus();
     }
 }
 
 function verifyAdmin() {
+    // Ginamitan ng .trim() para matanggal ang extra space
     const pass = document.getElementById("adminPasswordInput").value.trim();
     if (pass === "malolos2026") {
         isAdmin = true;
@@ -344,7 +347,7 @@ function verifyAdmin() {
         alert("Matagumpay kang naka-login bilang Admin!");
         updateAdminUI();
     } else {
-        alert("Maling password! Subukan muli.");
+        alert("Maling password! Ang tamang password ay: malolos2026");
     }
 }
 
