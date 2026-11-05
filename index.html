@@ -28,7 +28,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #93c5fd;border-color:#
 label{display:block;font-size:12px;font-weight:700;color:#475569;margin:0 0 5px}.field{min-width:0}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.formgrid .wide{grid-column:1/-1}
 .toolbar{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:9px;align-items:end;margin-bottom:12px}
 .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;min-width:930px}th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:12px;vertical-align:top}th{background:#eff6ff;color:#173b7a;position:sticky;top:0;z-index:1}tr:last-child td{border-bottom:0}.status{font-size:10px;font-weight:800;text-transform:uppercase;padding:4px 7px;border-radius:20px;display:inline-block}.Pending{background:#fef3c7;color:#92400e}.Approved{background:#dcfce7;color:#166534}.Rejected{background:#fee2e2;color:#991b1b}
-.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{padding:6px 8px;font-size:11px}.qrbox{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#f8fafc;border:1px dashed #cbd5e1;padding:15px;border-radius:9px}#qrcode{background:#fff;padding:8px;border-radius:6px;min-width:136px;min-height:136px}
+.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{padding:6px 8px;font-size:11px}.qrbox{display:flex;gap:22px;align-items:center;flex-wrap:wrap;background:#f8fafc;border:1px dashed #cbd5e1;padding:15px;border-radius:9px}#qrcode{background:#fff;padding:8px;border-radius:6px;min-width:136px;min-height:136px;display:flex;align-items:center;justify-content:center}
 .summarygrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.summaryitem{padding:12px;background:#f8fafc;border-radius:8px}.summaryitem strong{display:block;font-size:22px;color:#1d4ed8}
 .notice{padding:11px 13px;border-radius:8px;background:#eff6ff;color:#1e40af;margin-bottom:14px}.error{background:#fef2f2;color:#991b1b}.successnote{background:#f0fdf4;color:#166534}
 .modal{position:fixed;inset:0;background:#0f172a99;display:flex;align-items:center;justify-content:center;padding:15px;z-index:10}.modalbox{background:white;padding:22px;border-radius:12px;width:min(440px,100%);box-shadow:0 12px 35px #0003}.modalbox h3{font-size:18px;color:var(--navy)}
@@ -118,7 +118,7 @@ footer{text-align:center;color:#64748b;padding:20px;font-size:11px}
  <div class="modalbox"><h3 id="personnelTitle">Personnel Record</h3><form id="personnelForm" class="formgrid">
  <div class="field wide"><label>Name *</label><input id="pName" required></div><div class="field"><label>Employee ID *</label><input id="pId" required></div>
  <div class="field"><label>Department *</label><input id="pDepartment" required></div><div class="field"><label>Vacation Leave Credits</label><input id="pVacation" type="number" min="0" step=".5" value="0"></div>
- <div class="field"><label>Sick Leave Credits</label><input id="pSick" type="number" min="0" step=".5" value="0"></div>
+ <div class="field"><label>Sick Credits</label><input id="pSick" type="number" min="0" step=".5" value="0"></div>
  <div class="wide" style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="secondary" id="cancelPersonnel">Cancel</button><button type="submit">Save Record</button></div></form></div>
 </div>
 
@@ -241,8 +241,26 @@ async function submitPersonnel(e){
 }
 
 function initQR(){
- const link=location.href.split("?")[0].split("#")[0]+"?mode=form";$("shareableLink").value=link;
- if(window.QRCode)new QRCode($("qrcode"),{text:link,width:120,height:120});
+ const link = location.href.split("?")[0].split("#")[0] + "?mode=form";
+ const shareableInput = $("shareableLink");
+ if(shareableInput) shareableInput.value = link;
+ 
+ const qrContainer = $("qrcode");
+ if(qrContainer && window.QRCode){
+   qrContainer.innerHTML = "";
+   try {
+     new QRCode(qrContainer, {
+       text: link,
+       width: 120,
+       height: 120,
+       colorDark: "#000000",
+       colorLight: "#ffffff",
+       correctLevel: QRCode.CorrectLevel.H
+     });
+   } catch(err) {
+     console.error("QR Generation failed:", err);
+   }
+ }
 }
 
 $("leaveForm").addEventListener("submit",async e=>{
@@ -268,7 +286,14 @@ $("addPersonnelBtn").addEventListener("click",()=>openPersonnel());$("cancelPers
 if(formMode){
  $("siteHeader").classList.add("hidden");$("siteNav").classList.add("hidden");$("dashboard").classList.add("hidden");$("qrPanel").classList.add("hidden");$("requestsPanel").classList.add("hidden");$("summaryPanel").classList.add("hidden");$("personnelPanel").classList.add("hidden");$("leaveFormPanel").classList.remove("hidden");$("formModeNotice").classList.remove("hidden");$("formHeading").textContent="Malolos City Jail — Online Leave Application";
 }else{
- $("leaveFormPanel").classList.add("hidden");initQR();setAdminUI();loadData();setInterval(loadData,POLL_INTERVAL_MS);
+ $("leaveFormPanel").classList.add("hidden");
+ window.addEventListener("DOMContentLoaded", initQR);
+ if (document.readyState === "complete" || document.readyState === "interactive") {
+   initQR();
+ }
+ setAdminUI();
+ loadData();
+ setInterval(loadData, POLL_INTERVAL_MS);
 }
 </script>
 </body>
